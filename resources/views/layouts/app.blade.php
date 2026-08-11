@@ -215,21 +215,49 @@
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
 
-                <div class="nav-label">İdarəetmə</div>
-                <a href="{{ route('buses.index') }}" class="{{ request()->routeIs('buses.*') ? 'active' : '' }}">
-                    <i class="bi bi-bus-front"></i> Avtobuslar
-                </a>
-                <a href="{{ route('complaints.index') }}" class="{{ request()->routeIs('complaints.*') ? 'active' : '' }}">
-                    <i class="bi bi-clipboard"></i> Şikayətlər
-                </a>
-                <a href="{{ route('warehouses.index') }}" class="{{ request()->routeIs('warehouses.*') ? 'active' : '' }}">
-                    <i class="bi bi-box-seam"></i> Anbar
-                </a>
+                @auth
+                    @php
+                        $role = Auth::user()->role;
+                    @endphp
 
-                <hr>
-                <a href="{{ url('/') }}" style="color:#666;">
-                    <i class="bi bi-house"></i> Ana Səhifə
-                </a>
+                    @if($role == 'admin' || $role == 'bus' || $role == 'directorate')
+                        <div class="nav-label">İdarəetmə</div>
+                        <a href="{{ route('buses.index') }}" class="{{ request()->routeIs('buses.*') ? 'active' : '' }}">
+                            <i class="bi bi-bus-front"></i> Avtobuslar
+                        </a>
+                    @endif
+
+                    @if($role == 'admin' || $role == 'complaint' || $role == 'directorate')
+                        <a href="{{ route('complaints.index') }}" class="{{ request()->routeIs('complaints.*') ? 'active' : '' }}">
+                            <i class="bi bi-clipboard"></i> Şikayətlər
+                        </a>
+                    @endif
+
+                    @if($role == 'admin' || $role == 'warehouse' || $role == 'directorate')
+                        <a href="{{ route('warehouses.index') }}" class="{{ request()->routeIs('warehouses.*') ? 'active' : '' }}">
+                            <i class="bi bi-box-seam"></i> Anbar
+                        </a>
+                    @endif
+
+                    @if($role == 'directorate')
+                        <div class="nav-label text-warning mt-3" style="color:#ffc107 !important;">
+                            <i class="bi bi-eye"></i> Yalnız Baxış
+                        </div>
+                    @endif
+
+                    <hr>
+                    <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                        <i class="bi bi-person"></i> Profil
+                    </a>
+
+                    <hr>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-danger w-100" style="border-radius:10px;">
+                            <i class="bi bi-box-arrow-right"></i> Çıxış
+                        </button>
+                    </form>
+                @endauth
             </div>
 
             <!-- Content -->

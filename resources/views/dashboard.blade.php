@@ -15,7 +15,7 @@
         <div class="card stat-card bg-primary-gradient">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="count">{{ $totalBuses }}</div>
+                    <div class="count">{{ $totalBuses ?? 0 }}</div>
                     <div class="label">🚌 Avtobuslar</div>
                 </div>
                 <div class="icon"><i class="bi bi-bus-front"></i></div>
@@ -26,7 +26,7 @@
         <div class="card stat-card bg-warning-gradient">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="count">{{ $totalComplaints }}</div>
+                    <div class="count">{{ $totalComplaints ?? 0 }}</div>
                     <div class="label">📋 Şikayətlər</div>
                 </div>
                 <div class="icon"><i class="bi bi-clipboard"></i></div>
@@ -37,7 +37,7 @@
         <div class="card stat-card bg-success-gradient">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="count">{{ $totalWarehouses }}</div>
+                    <div class="count">{{ $totalWarehouses ?? 0 }}</div>
                     <div class="label">📦 Anbar Məhsulları</div>
                 </div>
                 <div class="icon"><i class="bi bi-box-seam"></i></div>
@@ -48,7 +48,7 @@
         <div class="card stat-card bg-info-gradient">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="count">{{ $lowStockItems->count() }}</div>
+                    <div class="count">{{ $lowStockItems->count() ?? 0 }}</div>
                     <div class="label">⚠️ Tükənən Məhsullar</div>
                 </div>
                 <div class="icon"><i class="bi bi-exclamation-triangle"></i></div>
@@ -76,14 +76,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($recentBuses as $bus)
+                    @forelse($recentBuses ?? [] as $bus)
                     <tr>
                         <td>{{ $bus->id }}</td>
                         <td>{{ $bus->xett_no ?? '-' }}</td>
                         <td><strong>{{ $bus->dqn }}</strong></td>
                         <td>{{ $bus->surucu_adi ?? '-' }}</td>
                         <td>
-                            <span class="badge badge-status {{ $bus->aktiv ? 'aktiv' : 'passiv' }}">
+                            <span class="badge-status {{ $bus->aktiv ? 'aktiv' : 'passiv' }}">
                                 {{ $bus->aktiv ? '✅ Aktiv' : '❌ Passiv' }}
                             </span>
                         </td>
@@ -118,7 +118,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($recentComplaints as $complaint)
+                            @forelse($recentComplaints ?? [] as $complaint)
                             <tr>
                                 <td><strong>{{ $complaint->bus->dqn ?? '-' }}</strong></td>
                                 <td>{{ Str::limit($complaint->shikayet ?? '-', 20) }}</td>
@@ -157,7 +157,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($lowStockItems as $item)
+                            @forelse($lowStockItems ?? [] as $item)
                             <tr>
                                 <td><strong>{{ $item->kod }}</strong></td>
                                 <td>{{ $item->ad }}</td>
