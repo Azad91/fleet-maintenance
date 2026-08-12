@@ -55,23 +55,21 @@
                 <input type="text" class="form-control" id="surucu_adi" name="surucu_adi" placeholder="Məs: Elşad Məmmədov">
             </div>
 
-            <!-- Dinamik Şikayətlər (Select ilə) -->
+            <!-- Dinamik Şikayətlər -->
             <div class="mb-3">
                 <label class="form-label fw-bold">📝 Şikayətlər</label>
                 <div id="shikayetContainer">
-                    <div class="shikayet-item mb-2">
-                        <div class="input-group">
-                            <span class="input-group-text" style="min-width: 40px;">1.</span>
-                            <select class="form-select" name="shikayet[]" required>
-                                <option value="">Şikayət seçin...</option>
-                                @foreach($complaintTypes as $type)
-                                    <option value="{{ $type->name }}">{{ $type->name }}</option>
-                                @endforeach
-                            </select>
-                            <button type="button" class="btn btn-danger" onclick="removeShikayet(this)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
+                    <div class="shikayet-item input-group mb-2">
+                        <span class="input-group-text" style="min-width: 40px;">1.</span>
+                        <select class="form-select" name="shikayet[]" required>
+                            <option value="">Şikayət seçin...</option>
+                            @foreach($complaintTypes as $type)
+                                <option value="{{ $type->name }}">{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                        <button type="button" class="btn btn-danger" onclick="removeShikayet(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
                 <button type="button" class="btn btn-primary btn-sm mt-2" onclick="addShikayet()">
@@ -89,13 +87,13 @@
                 <small class="text-muted">Avtobus seçildikdə avtomatik olaraq dolur</small>
             </div>
 
-            <!-- Bildirilme tarix + saat -->
+            <!-- Bildirilme tarix + saat (YALNIZ YOL ÜÇÜN) -->
             <div id="bildirilmeFields">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="bildirilme_tarix" class="form-label fw-bold">📅 Bildirilme Tarix</label>
-                            <input type="date" class="form-control" id="bildirilme_tarix" name="bildirilme_tarix">
+                            <input type="date" class="form-control" id="bildirilme_tarix" name="bildirilme_tarix" value="{{ date('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -112,7 +110,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="is_baslama_tarix" class="form-label fw-bold">📅 İşə Başlama Tarix</label>
-                        <input type="date" class="form-control" id="is_baslama_tarix" name="is_baslama_tarix">
+                        <input type="date" class="form-control" id="is_baslama_tarix" name="is_baslama_tarix" value="{{ date('Y-m-d') }}">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -128,7 +126,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="is_bitme_tarix" class="form-label fw-bold">📅 İşin Bitdiyi Tarix</label>
-                        <input type="date" class="form-control" id="is_bitme_tarix" name="is_bitme_tarix">
+                        <input type="date" class="form-control" id="is_bitme_tarix" name="is_bitme_tarix" value="{{ date('Y-m-d') }}">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -178,7 +176,7 @@
                                 <div class="mb-2">
                                     <label class="form-label fw-bold">Aid Olduğu Şikayət</label>
                                     <select class="form-select" name="detallar[0][shikayet_index]">
-                                        <option value="0">1. Şikayət</option>
+                                        <option value="0">Şikayət 1</option>
                                     </select>
                                 </div>
                             </div>
@@ -200,17 +198,7 @@
                                 <div class="mb-2">
                                     <label class="form-label fw-bold">Depo Miqdarı</label>
                                     <input type="text" class="form-control" name="detallar[0][depo_miqdari]"
-                                           readonly disabled style="background:#e9ecef; cursor:not-allowed; -moz-appearance:textfield;">
-                                    <style>
-                                        input[name*="[depo_miqdari]"]::-webkit-outer-spin-button,
-                                        input[name*="[depo_miqdari]"]::-webkit-inner-spin-button {
-                                            -webkit-appearance: none;
-                                            margin: 0;
-                                        }
-                                        input[name*="[depo_miqdari]"] {
-                                            -moz-appearance: textfield;
-                                        }
-                                    </style>
+                                           readonly disabled style="background:#e9ecef; cursor:not-allowed;">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -264,7 +252,6 @@
 
 @section('scripts')
 <script>
-    // ==================== 1. AVTOBUS ====================
     function getBusByXett(xett_no) {
         if (!xett_no) {
             document.getElementById('dqn').value = '';
@@ -291,7 +278,6 @@
             .catch(error => console.error('Xəta:', error));
     }
 
-    // ==================== 2. YOL / QARAJ ====================
     function toggleFields() {
         const yer = document.querySelector('input[name="yer"]:checked').value;
         const surucuField = document.getElementById('surucuField');
@@ -306,31 +292,26 @@
         }
     }
 
-    // ==================== 3. DİNAMİK ŞİKAYƏTLƏR (SELECT) ====================
     function addShikayet() {
         const container = document.getElementById('shikayetContainer');
         const items = container.querySelectorAll('.shikayet-item');
         const newNumber = items.length + 1;
 
         const newItem = document.createElement('div');
-        newItem.className = 'shikayet-item mb-2';
+        newItem.className = 'shikayet-item input-group mb-2';
         newItem.innerHTML = `
-            <div class="input-group">
-                <span class="input-group-text" style="min-width: 40px;">${newNumber}.</span>
-                <select class="form-select" name="shikayet[]" required>
-                    <option value="">Şikayət seçin...</option>
-                    @foreach($complaintTypes as $type)
-                        <option value="{{ $type->name }}">{{ $type->name }}</option>
-                    @endforeach
-                </select>
-                <button type="button" class="btn btn-danger" onclick="removeShikayet(this)">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
+            <span class="input-group-text" style="min-width: 40px;">${newNumber}.</span>
+            <select class="form-select" name="shikayet[]" required>
+                <option value="">Şikayət seçin...</option>
+                @foreach($complaintTypes as $type)
+                    <option value="{{ $type->name }}">{{ $type->name }}</option>
+                @endforeach
+            </select>
+            <button type="button" class="btn btn-danger" onclick="removeShikayet(this)">
+                <i class="bi bi-trash"></i>
+            </button>
         `;
         container.appendChild(newItem);
-
-        // Detalların seçimlərini yenilə
         updateDetalOptions();
     }
 
@@ -355,13 +336,11 @@
         });
     }
 
-    // ==================== 4. DİNAMİK DETALLAR ====================
     let detalCount = 1;
 
     function addDetal() {
         const container = document.getElementById('detallarContainer');
 
-        // Şikayət seçimlərini yığ
         const shikayetSelects = document.querySelectorAll('select[name="shikayet[]"]');
         let options = '';
         shikayetSelects.forEach((select, index) => {
@@ -403,7 +382,7 @@
                     <div class="mb-2">
                         <label class="form-label fw-bold">Depo Miqdarı</label>
                         <input type="text" class="form-control" name="detallar[${detalCount}][depo_miqdari]"
-                               readonly disabled style="background:#e9ecef; cursor:not-allowed; -moz-appearance:textfield;">
+                               readonly disabled style="background:#e9ecef; cursor:not-allowed;">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -436,7 +415,6 @@
         }
     }
 
-    // ==================== 5. DETALLARIN SEÇİMLƏRİNİ YENİLƏ ====================
     function updateDetalOptions() {
         const shikayetSelects = document.querySelectorAll('select[name="shikayet[]"]');
         const detalSelects = document.querySelectorAll('select[name*="[shikayet_index]"]');
@@ -465,14 +443,12 @@
         });
     }
 
-    // Şikayət select - i dəyişəndə detalları yenilə
     document.addEventListener('change', function(e) {
         if (e.target && e.target.name === 'shikayet[]') {
             updateDetalOptions();
         }
     });
 
-    // ==================== 6. DETAL KODUNA GÖRƏ ANBAR - DAN MƏLUMAT ÇƏK ====================
     function getDetalByKod(input, index) {
         const kod = input.value;
         const item = input.closest('.detallar-item');
@@ -494,7 +470,6 @@
             .catch(error => console.error('Xəta:', error));
     }
 
-    // ==================== 7. SƏHİFƏ YÜKLƏNDİKDƏ ====================
     document.addEventListener('DOMContentLoaded', function() {
         toggleFields();
     });

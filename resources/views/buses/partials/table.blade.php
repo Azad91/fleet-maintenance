@@ -26,23 +26,42 @@
                         </td>
                         <td>
                             <a href="{{ route('buses.show', $bus) }}" class="btn btn-sm btn-primary">👁️ Bax</a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
-                            <i class="bi bi-bus-front" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
-                            @if(isset($search) && $search)
-                                "<strong>{{ $search }}</strong>" üzrə heç nə tapılmadı
-                            @else
-                                Hələ avtobus yoxdur. <a href="{{ route('buses.import') }}">Excel - dən yüklə!</a>
+                            @if(Auth::user()->role == 'admin')
+                                <a href="{{ route('buses.edit', $bus) }}" class="btn btn-sm btn-warning">✏️</a>
+                                <form action="{{ route('buses.destroy', $bus) }}" method="POST" style="display:inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsən?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             @endif
                         </td>
                     </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-bus-front" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
+                                @if(isset($search) && $search)
+                                    "<strong>{{ $search }}</strong>" üzrə heç nə tapılmadı
+                                @else
+                                    Hələ avtobus yoxdur. <a href="{{ route('buses.import') }}">Excel - dən yüklə!</a>
+                                @endif
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
-            <span class="total-count d-none" data-count="{{ $buses->count() }}"></span>
         </div>
+
+        <!-- ==================== PAGINATION ==================== -->
+        @if($buses->hasPages())
+            <div class="pagination-wrapper">
+                {{ $buses->appends(request()->query())->links() }}
+            </div>
+        @endif
+
+        <!-- Toplam sayını gizli saxlamaq üçün -->
+        <span class="total-count d-none" data-count="{{ $buses->count() }}"></span>
     </div>
 </div>

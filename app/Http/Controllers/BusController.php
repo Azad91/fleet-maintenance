@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BusStoreRequest;
+use App\Http\Requests\BusUpdateRequest;
 use App\Models\Bus;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -9,14 +11,10 @@ use App\Imports\BusesImport;
 
 class BusController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $sort = $request->sort ?? 'id'; // default: id
-        $order = $request->order ?? 'asc'; // default: asc
-
-        $buses = Bus::orderBy($sort, $order)->get();
-
-        return view('buses.index', compact('buses', 'sort', 'order'));
+        $buses = Bus::orderBy('id')->paginate(config('settings.pagination', 15));
+        return view('buses.index', compact('buses'));
     }
 
     public function search(Request $request)
@@ -31,7 +29,7 @@ class BusController extends Controller
                         ->orWhere('km', 'ILIKE', "%{$search}%");
         })
         ->orderBy($sort, $order)
-        ->get();
+        ->paginate(config('settings.pagination', 15));
 
         return view('buses.partials.table', compact('buses', 'search'));
     }
@@ -43,6 +41,40 @@ class BusController extends Controller
             $bus->detallar = is_array($bus->detallar) ? $bus->detallar : json_decode($bus->detallar, true);
         }
         return view('buses.show', compact('bus'));
+    }
+
+    public function create()
+    {
+        return view('buses.create');
+    }
+
+    public function store(BusStoreRequest $request)
+    {
+        Bus::create($request->validated());
+        return redirect()->route('buses.index')->with('success', 'Avtobus uğurla əlavə edildi!');
+    }
+
+    public function edit($id)
+    {
+        $bus = Bus::findOrFail($id);
+        if ($bus->detallar) {
+            $bus->detallar = is_array($bus->detallar) ? $bus->detallar : json_decode($bus->detallar, true);
+        }
+        return view('buses.edit', compact('bus'));
+    }
+
+    public function update(BusUpdateRequest $request, $id)
+    {
+        $bus = Bus::findOrFail($id);
+        $bus->update($request->validated());
+        return redirect()->route('buses.index')->with('success', 'Avtobus uğurla yeniləndi!');
+    }
+
+    public function destroy($id)
+    {
+        $bus = Bus::findOrFail($id);
+        $bus->delete();
+        return redirect()->route('buses.index')->with('success', 'Avtobus uğurla silindi!');
     }
 
     // =============== IMPORT ===============

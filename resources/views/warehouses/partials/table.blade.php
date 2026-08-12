@@ -23,9 +23,9 @@
                         <td>
                             {{ $item->miqdar }}
                             @if($item->miqdar <= 0)
-                                <span class="text-danger">⚠️</span>
-                            @elseif($item->miqdar <= 5)
-                                <span class="text-warning">⚠️</span>
+                                <span class="badge bg-danger">⚠️ Bitib</span>
+                            @elseif($item->miqdar <= $item->minimum_miqdar)
+                                <span class="badge bg-warning">⚠️ Tükənir</span>
                             @endif
                         </td>
                         <td>{{ $item->olcu_vahidi ?? '-' }}</td>
@@ -42,16 +42,18 @@
                                 <a href="{{ route('warehouses.show', $item) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ route('warehouses.edit', $item) }}" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="{{ route('warehouses.destroy', $item) }}" method="POST" style="display:inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsən?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                @if(Auth::user()->role == 'admin' || Auth::user()->role == 'warehouse')
+                                    <a href="{{ route('warehouses.edit', $item) }}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('warehouses.destroy', $item) }}" method="POST" style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsən?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -62,14 +64,23 @@
                             @if(isset($search) && $search)
                                 "<strong>{{ $search }}</strong>" üzrə heç nə tapılmadı
                             @else
-                                Hələ anbarda məhsul yoxdur
+                                Hələ anbarda məhsul yoxdur. <a href="{{ route('warehouses.create') }}">Yenisini əlavə et!</a>
                             @endif
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
-            <span class="total-count d-none" data-count="{{ $warehouses->count() }}"></span>
         </div>
+
+        <!-- ==================== PAGINATION ==================== -->
+        @if($warehouses->hasPages())
+            <div class="pagination-wrapper">
+                {{ $warehouses->links() }}
+            </div>
+        @endif
+
+        <!-- Toplam sayını gizli saxlamaq üçün -->
+        <span class="total-count d-none" data-count="{{ $warehouses->count() }}"></span>
     </div>
 </div>

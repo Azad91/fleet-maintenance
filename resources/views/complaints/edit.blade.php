@@ -118,25 +118,27 @@
                        value="{{ old('km', $complaint->km) }}" placeholder="Məs: 150000" min="0" readonly style="background:#e9ecef;">
             </div>
 
-            <!-- Bildirilme -->
+            <!-- Bildirilme tarix + saat (YALNIZ YOL ÜÇÜN) -->
+            @if($complaint->yer == 'yol')
             <div id="bildirilmeFields">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="bildirilme_tarix" class="form-label fw-bold">📅 Bildirilme Tarix</label>
                             <input type="date" class="form-control" id="bildirilme_tarix" name="bildirilme_tarix"
-                                   value="{{ old('bildirilme_tarix', $complaint->bildirilme_tarix ? \Carbon\Carbon::parse($complaint->bildirilme_tarix)->format('Y-m-d') : '') }}">
+                                value="{{ old('bildirilme_tarix', $complaint->bildirilme_tarix ? \Carbon\Carbon::parse($complaint->bildirilme_tarix)->format('Y-m-d') : date('Y-m-d')) }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="bildirilme_saat" class="form-label fw-bold">🕐 Bildirilme Saat</label>
                             <input type="time" class="form-control" id="bildirilme_saat" name="bildirilme_saat"
-                                   value="{{ old('bildirilme_saat', $complaint->bildirilme_saat) }}">
+                                value="{{ old('bildirilme_saat', $complaint->bildirilme_saat) }}">
                         </div>
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- İşə başlama -->
             <div class="row">
@@ -239,38 +241,28 @@
                                         <div class="mb-2">
                                             <label class="form-label fw-bold">Detal Kodu</label>
                                             <input type="text" class="form-control" name="detallar[{{ $index }}][kodu]"
-                                                   value="{{ $detal['kodu'] ?? '' }}" oninput="getDetalByKod(this, {{ $index }})">
+                                                value="{{ $detal['kodu'] ?? '' }}" oninput="getDetalByKod(this, {{ $index }})">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="mb-2">
                                             <label class="form-label fw-bold">Detal Adı</label>
                                             <input type="text" class="form-control" name="detallar[{{ $index }}][adi]"
-                                                   value="{{ $detal['adi'] ?? '' }}" readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                                                value="{{ $detal['adi'] ?? '' }}" readonly disabled style="background:#e9ecef; cursor:not-allowed;">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="mb-2">
                                             <label class="form-label fw-bold">Depo Miqdarı</label>
                                             <input type="text" class="form-control" name="detallar[{{ $index }}][depo_miqdari]"
-                                                   value="{{ $detal['depo_miqdari'] ?? '' }}" readonly disabled style="background:#e9ecef; cursor:not-allowed; -moz-appearance:textfield;">
-                                            <style>
-                                                input[name*="[depo_miqdari]"]::-webkit-outer-spin-button,
-                                                input[name*="[depo_miqdari]"]::-webkit-inner-spin-button {
-                                                    -webkit-appearance: none;
-                                                    margin: 0;
-                                                }
-                                                input[name*="[depo_miqdari]"] {
-                                                    -moz-appearance: textfield;
-                                                }
-                                            </style>
+                                                value="{{ $detal['depo_miqdari'] ?? '' }}" readonly disabled style="background:#e9ecef; cursor:not-allowed;">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="mb-2">
                                             <label class="form-label fw-bold">İşlənən Miqdar</label>
                                             <input type="number" class="form-control" name="detallar[{{ $index }}][islenen_miqdar]"
-                                                   value="{{ $detal['islenen_miqdar'] ?? 0 }}" min="0">
+                                                value="{{ $detal['islenen_miqdar'] ?? 0 }}" min="0">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -299,28 +291,28 @@
                                     <div class="mb-2">
                                         <label class="form-label fw-bold">Detal Kodu</label>
                                         <input type="text" class="form-control" name="detallar[0][kodu]"
-                                               placeholder="Məs: D-001" oninput="getDetalByKod(this, 0)">
+                                            placeholder="Məs: D-001" oninput="getDetalByKod(this, 0)">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="mb-2">
                                         <label class="form-label fw-bold">Detal Adı</label>
                                         <input type="text" class="form-control" name="detallar[0][adi]"
-                                               readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                                            readonly disabled style="background:#e9ecef; cursor:not-allowed;">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="mb-2">
                                         <label class="form-label fw-bold">Depo Miqdarı</label>
                                         <input type="text" class="form-control" name="detallar[0][depo_miqdari]"
-                                               readonly disabled style="background:#e9ecef; cursor:not-allowed; -moz-appearance:textfield;">
+                                            readonly disabled style="background:#e9ecef; cursor:not-allowed;">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="mb-2">
                                         <label class="form-label fw-bold">İşlənən Miqdar</label>
                                         <input type="number" class="form-control" name="detallar[0][islenen_miqdar]"
-                                               placeholder="0" min="0" value="0">
+                                            placeholder="0" min="0" value="0">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -351,7 +343,7 @@
             <div class="mb-3">
                 <label for="kim_is_gorub" class="form-label fw-bold">👤 Kim iş görüb</label>
                 <input type="text" class="form-control" id="kim_is_gorub" name="kim_is_gorub"
-                       value="{{ old('kim_is_gorub', $complaint->kim_is_gorub) }}">
+                    value="{{ old('kim_is_gorub', $complaint->kim_is_gorub) }}">
             </div>
 
             <div class="d-flex gap-2">

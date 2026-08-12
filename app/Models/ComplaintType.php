@@ -12,4 +12,10 @@ class ComplaintType extends Model
     protected $fillable = [
         'name',
     ];
+
+    // ==================== SCOPES ====================
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'ILIKE', "%{$search}%");
+    }
 }

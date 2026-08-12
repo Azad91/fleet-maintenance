@@ -17,8 +17,10 @@ class DailyKm extends Model
 
     protected $casts = [
         'tarix' => 'date',
+        'km' => 'integer',
     ];
 
+    // ==================== RELATIONSHIPS ====================
     public function bus()
     {
         return $this->belongsTo(Bus::class);

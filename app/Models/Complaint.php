@@ -33,10 +33,23 @@ class Complaint extends Model
         'is_baslama_tarix' => 'date',
         'is_bitme_tarix' => 'date',
         'detallar' => 'array',
+        'km' => 'integer',
     ];
 
+    // ==================== RELATIONSHIPS ====================
     public function bus()
     {
         return $this->belongsTo(Bus::class);
+    }
+
+    // ==================== SCOPES ====================
+    public function scopeStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    public function scopeYer($query, $yer)
+    {
+        return $query->where('yer', $yer);
     }
 }

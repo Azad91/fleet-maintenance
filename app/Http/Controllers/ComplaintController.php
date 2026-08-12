@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ComplaintStoreRequest;
+use App\Http\Requests\ComplaintUpdateRequest;
 use App\Models\Bus;
 use App\Models\Complaint;
-use App\Models\ComplaintType;  // YENİ
-use App\Models\Warehouse;      // YENİ
+use App\Models\ComplaintType;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ComplaintsImport;
@@ -14,7 +16,9 @@ class ComplaintController extends Controller
 {
     public function index()
     {
-        $complaints = Complaint::with('bus')->orderBy('id', 'desc')->get();
+        $complaints = Complaint::with('bus')
+            ->orderBy('id', 'desc')
+            ->paginate(config('settings.pagination', 15));
         return view('complaints.index', compact('complaints'));
     }
 
@@ -43,7 +47,7 @@ class ComplaintController extends Controller
                 return $query->where('shikayet', 'ILIKE', "%{$shikayet}%");
             })
             ->orderBy('id', 'desc')
-            ->get();
+            ->paginate(config('settings.pagination', 15));
 
         return view('complaints.partials.table', compact('complaints', 'dqn', 'xett_no', 'yer', 'shikayet'));
     }
@@ -55,28 +59,9 @@ class ComplaintController extends Controller
         return view('complaints.create', compact('buses', 'complaintTypes'));
     }
 
-    public function store(Request $request)
+    public function store(ComplaintStoreRequest $request)
     {
-        $request->validate([
-            'bus_id' => 'required|exists:buses,id',
-            'yer' => 'nullable|string|in:yol,qaraj',
-            'surucu_adi' => 'nullable|string|max:255',
-            'shikayet' => 'nullable|array',
-            'shikayet.*' => 'nullable|string|max:1000',
-            'sikayet_tipi' => 'nullable|in:qezali,texniki_xidmet,nasazliq',
-            'bildirilme_tarix' => 'nullable|date',
-            'bildirilme_saat' => 'nullable|date_format:H:i',
-            'is_baslama_tarix' => 'nullable|date',
-            'is_baslama_saat' => 'nullable|date_format:H:i',
-            'is_bitme_tarix' => 'nullable|date',
-            'is_bitme_saat' => 'nullable|date_format:H:i',
-            'status' => 'required|in:gözləmədə,işdə,həll olundu',
-            'km' => 'nullable|integer|min:0',
-            'qeyd' => 'nullable|string',
-            'kim_is_gorub' => 'nullable|string|max:255',
-        ]);
-
-        $data = $request->all();
+        $data = $request->validated();
 
         // Şikayət array - ni string - ə çevir
         if ($request->has('shikayet') && is_array($request->shikayet)) {
@@ -85,34 +70,36 @@ class ComplaintController extends Controller
 
         // Detalları JSON olaraq saxla
         if ($request->has('detallar') && is_array($request->detallar)) {
-            $data['detallar'] = json_encode($request->detallar, JSON_UNESCAPED_UNICODE);
-
-            // Hər detal üçün anbar miqdarını yenilə
+            $detallar = [];
             foreach ($request->detallar as $detal) {
-                if (!empty($detal['kodu']) && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
-                    $warehouse = \App\Models\Warehouse::where('kod', $detal['kodu'])->first();
-                    if ($warehouse) {
+                if (!empty($detal['kodu'])) {
+                    $warehouse = Warehouse::where('kod', $detal['kodu'])->first();
+                    $detallar[] = [
+                        'shikayet_index' => $detal['shikayet_index'] ?? 0,
+                        'kodu' => $detal['kodu'],
+                        'adi' => $warehouse ? $warehouse->ad : null,
+                        'depo_miqdari' => $warehouse ? $warehouse->miqdar : null,
+                        'islenen_miqdar' => $detal['islenen_miqdar'] ?? 0,
+                    ];
+
+                    if ($warehouse && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
                         $warehouse->miqdar = $warehouse->miqdar - $detal['islenen_miqdar'];
                         $warehouse->save();
                     }
                 }
             }
+            $data['detallar'] = json_encode($detallar, JSON_UNESCAPED_UNICODE);
+        } else {
+            $data['detallar'] = null;
         }
 
         Complaint::create($data);
-
         return redirect()->route('complaints.index')->with('success', 'Şikayət uğurla əlavə edildi!');
     }
 
     public function show($id)
     {
         $complaint = Complaint::with('bus')->findOrFail($id);
-
-        // Detalları array - a çevir
-        if ($complaint->detallar) {
-            $complaint->detallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
-        }
-
         return view('complaints.show', compact('complaint'));
     }
 
@@ -121,68 +108,61 @@ class ComplaintController extends Controller
         $complaint = Complaint::findOrFail($id);
         $buses = Bus::orderBy('xett_no')->get();
         $complaintTypes = ComplaintType::orderBy('name')->get();
-
-        // Detalları array - a çevir
-        if ($complaint->detallar) {
-            $complaint->detallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
-        }
-
         return view('complaints.edit', compact('complaint', 'buses', 'complaintTypes'));
     }
 
-    public function update(Request $request, $id)
+    public function update(ComplaintUpdateRequest $request, $id)
     {
         $complaint = Complaint::findOrFail($id);
-
-        $request->validate([
-            'bus_id' => 'required|exists:buses,id',
-            'yer' => 'nullable|string|in:yol,qaraj',
-            'surucu_adi' => 'nullable|string|max:255',
-            'shikayet' => 'nullable|array',
-            'shikayet.*' => 'nullable|string|max:1000',
-            'sikayet_tipi' => 'nullable|in:qezali,texniki_xidmet,nasazliq',
-            'bildirilme_tarix' => 'nullable|date',
-            'bildirilme_saat' => 'nullable|date_format:H:i',
-            'is_baslama_tarix' => 'nullable|date',
-            'is_baslama_saat' => 'nullable|date_format:H:i',
-            'is_bitme_tarix' => 'nullable|date',
-            'is_bitme_saat' => 'nullable|date_format:H:i',
-            'status' => 'required|in:gözləmədə,işdə,həll olundu',
-            'km' => 'nullable|integer|min:0',
-            'qeyd' => 'nullable|string',
-            'kim_is_gorub' => 'nullable|string|max:255',
-        ]);
-
-        $data = $request->all();
+        $data = $request->validated();
 
         // Şikayət array - ni string - ə çevir
         if ($request->has('shikayet') && is_array($request->shikayet)) {
             $data['shikayet'] = implode("\n", array_filter($request->shikayet));
         }
 
-        // Detalları JSON olaraq saxla
-        if ($request->has('detallar') && is_array($request->detallar)) {
-            $detallar = array_filter($request->detallar, function($detal) {
-                return !empty($detal['kodu']) || !empty($detal['islenen_miqdar']);
-            });
-            $data['detallar'] = json_encode($detallar, JSON_UNESCAPED_UNICODE);
+        // Köhnə detalları yadda saxla (anbar əməliyyatı üçün)
+        $oldDetallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
 
-            // Hər detal üçün anbar miqdarını yenilə
-            foreach ($detallar as $detal) {
+        // Köhnə detalları geri qaytar (anbara)
+        if ($oldDetallar) {
+            foreach ($oldDetallar as $detal) {
                 if (!empty($detal['kodu']) && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
-                    $warehouse = \App\Models\Warehouse::where('kod', $detal['kodu'])->first();
+                    $warehouse = Warehouse::where('kod', $detal['kodu'])->first();
                     if ($warehouse) {
+                        $warehouse->miqdar = $warehouse->miqdar + $detal['islenen_miqdar'];
+                        $warehouse->save();
+                    }
+                }
+            }
+        }
+
+        // Yeni detalları yığ və anbardan çıxar
+        if ($request->has('detallar') && is_array($request->detallar)) {
+            $detallar = [];
+            foreach ($request->detallar as $detal) {
+                if (!empty($detal['kodu'])) {
+                    $warehouse = Warehouse::where('kod', $detal['kodu'])->first();
+                    $detallar[] = [
+                        'shikayet_index' => $detal['shikayet_index'] ?? 0,
+                        'kodu' => $detal['kodu'],
+                        'adi' => $warehouse ? $warehouse->ad : null,
+                        'depo_miqdari' => $warehouse ? $warehouse->miqdar : null,
+                        'islenen_miqdar' => $detal['islenen_miqdar'] ?? 0,
+                    ];
+
+                    if ($warehouse && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
                         $warehouse->miqdar = $warehouse->miqdar - $detal['islenen_miqdar'];
                         $warehouse->save();
                     }
                 }
             }
+            $data['detallar'] = json_encode($detallar, JSON_UNESCAPED_UNICODE);
         } else {
             $data['detallar'] = null;
         }
 
         $complaint->update($data);
-
         return redirect()->route('complaints.index')->with('success', 'Şikayət uğurla yeniləndi!');
     }
 
@@ -190,7 +170,6 @@ class ComplaintController extends Controller
     {
         $complaint = Complaint::findOrFail($id);
         $complaint->delete();
-
         return redirect()->route('complaints.index')->with('success', 'Şikayət uğurla silindi!');
     }
 

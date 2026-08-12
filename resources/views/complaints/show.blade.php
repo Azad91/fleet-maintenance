@@ -11,7 +11,7 @@
         </span>
     </div>
     <div class="card-body">
-        <!-- 1. Avtobus Məlumatları -->
+        <!-- Avtobus Məlumatları -->
         <div class="row mb-4">
             <div class="col-12">
                 <h6 class="fw-bold text-primary mb-3"><i class="bi bi-bus-front me-2"></i>Avtobus Məlumatları</h6>
@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        <!-- 2. Şikayətlər (hamısı) -->
+        <!-- Şikayətlər -->
         <div class="row mb-4">
             <div class="col-12">
                 <h6 class="fw-bold text-warning mb-3"><i class="bi bi-clipboard me-2"></i>Şikayətlər</h6>
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <!-- 3. Tarix və Saat -->
+        <!-- Tarix və Saat -->
         <div class="row mb-4">
             <div class="col-12">
                 <h6 class="fw-bold text-info mb-3"><i class="bi bi-clock me-2"></i>Tarix və Saat</h6>
@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <!-- 4. KM (Yürüş) -->
+        <!-- KM -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="p-2 bg-light rounded">
@@ -131,7 +131,7 @@
             </div>
         </div>
 
-        <!-- 5. Detallar (hər şikayət üçün) -->
+        <!-- Detallar -->
         <div class="row mb-4">
             <div class="col-12">
                 <h6 class="fw-bold text-success mb-3"><i class="bi bi-tools me-2"></i>🔧 İstifadə Olunan Detallar</h6>
@@ -181,7 +181,7 @@
             </div>
         </div>
 
-        <!-- 6. Qeyd və İşçi -->
+        <!-- Qeyd və İşçi -->
         <div class="row mb-4">
             <div class="col-12">
                 <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-pencil me-2"></i>📝 Qeyd və İşçi</h6>
@@ -202,7 +202,7 @@
             </div>
         </div>
 
-        <!-- 7. Əlavə məlumatlar -->
+        <!-- Əlavə məlumatlar -->
         <div class="row mb-4">
             <div class="col-12">
                 <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-info-circle me-2"></i>ℹ️ Əlavə Məlumatlar</h6>
@@ -225,9 +225,6 @@
 
         <!-- Düymələr -->
         <div class="d-flex gap-2 mt-3">
-            <a href="{{ route('complaints.edit', $complaint) }}" class="btn btn-warning">
-                <i class="bi bi-pencil me-1"></i> Redaktə Et
-            </a>
             <a href="{{ route('complaints.index') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left me-1"></i> Geri
             </a>

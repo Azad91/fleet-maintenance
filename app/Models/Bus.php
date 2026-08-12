@@ -22,7 +22,7 @@ class Bus extends Model
         'surucu_adi',
         'detallar',
         'aktiv',
-        'km',      // YENİ
+        'km',
     ];
 
     protected $casts = [
@@ -31,5 +31,28 @@ class Bus extends Model
         'is_baslama_tarix' => 'date',
         'is_bitme_tarix' => 'date',
         'detallar' => 'array',
+        'km' => 'integer',
     ];
+
+    // ==================== RELATIONSHIPS ====================
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
+    public function dailyKms()
+    {
+        return $this->hasMany(DailyKm::class);
+    }
+
+    // ==================== SCOPES ====================
+    public function scopeActive($query)
+    {
+        return $query->where('aktiv', true);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('aktiv', false);
+    }
 }

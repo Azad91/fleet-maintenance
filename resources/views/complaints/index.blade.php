@@ -5,9 +5,14 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>📋 Şikayətlər</h1>
-    <a href="{{ route('complaints.create') }}" class="btn btn-success">
-        <i class="bi bi-plus-lg"></i> Yeni Şikayət
-    </a>
+    <div>
+        <a href="{{ route('complaint-types.index') }}" class="btn btn-info">
+            <i class="bi bi-tags"></i> Şikayət Başlıqları
+        </a>
+        <a href="{{ route('complaints.create') }}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Yeni Şikayət
+        </a>
+    </div>
 </div>
 
 <!-- Axtarış Formu -->
@@ -54,7 +59,6 @@
 
 @section('scripts')
 <script>
-    // Canlı axtarış - hər dəyişiklikdə avtomatik
     document.addEventListener('DOMContentLoaded', function() {
         const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
         const form = document.getElementById('searchForm');

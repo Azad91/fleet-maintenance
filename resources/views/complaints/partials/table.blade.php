@@ -39,16 +39,18 @@
                                 <a href="{{ route('complaints.show', $complaint) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ route('complaints.edit', $complaint) }}" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="{{ route('complaints.destroy', $complaint) }}" method="POST" style="display:inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsən?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                @if(Auth::user()->role == 'admin' || Auth::user()->role == 'complaint')
+                                    <a href="{{ route('complaints.edit', $complaint) }}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('complaints.destroy', $complaint) }}" method="POST" style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsən?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -56,8 +58,8 @@
                     <tr>
                         <td colspan="7" class="text-center text-muted py-4">
                             <i class="bi bi-clipboard" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
-                            @if(isset($search) && $search)
-                                "<strong>{{ $search }}</strong>" üzrə heç nə tapılmadı
+                            @if(isset($dqn) || isset($xett_no) || isset($yer) || isset($shikayet))
+                                Axtarış nəticəsində heç nə tapılmadı
                             @else
                                 Hələ şikayət yoxdur. <a href="{{ route('complaints.create') }}">Yenisini əlavə et!</a>
                             @endif
@@ -66,7 +68,16 @@
                     @endforelse
                 </tbody>
             </table>
-            <span class="total-count d-none" data-count="{{ $complaints->count() }}"></span>
         </div>
+
+        <!-- ==================== PAGINATION ==================== -->
+        @if($complaints->hasPages())
+            <div class="pagination-wrapper">
+                {{ $complaints->links() }}
+            </div>
+        @endif
+
+        <!-- Toplam sayını gizli saxlamaq üçün -->
+        <span class="total-count d-none" data-count="{{ $complaints->count() }}"></span>
     </div>
 </div>

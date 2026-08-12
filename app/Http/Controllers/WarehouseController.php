@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\WarehouseStoreRequest;
+use App\Http\Requests\WarehouseUpdateRequest;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -18,7 +20,7 @@ class WarehouseController extends Controller
                         ->orWhere('ad', 'ILIKE', "%{$search}%");
         })
         ->orderBy('id', 'desc')
-        ->get();
+        ->paginate(config('settings.pagination', 15));
 
         return view('warehouses.index', compact('warehouses', 'search'));
     }
@@ -32,7 +34,7 @@ class WarehouseController extends Controller
                         ->orWhere('ad', 'ILIKE', "%{$search}%");
         })
         ->orderBy('id', 'desc')
-        ->get();
+        ->paginate(config('settings.pagination', 15));
 
         return view('warehouses.partials.table', compact('warehouses', 'search'));
     }
@@ -42,18 +44,9 @@ class WarehouseController extends Controller
         return view('warehouses.create');
     }
 
-    public function store(Request $request)
+    public function store(WarehouseStoreRequest $request)
     {
-        $request->validate([
-            'kod' => 'required|unique:warehouses,kod',
-            'ad' => 'required|string|max:255',
-            'miqdar' => 'required|integer|min:0',
-            'olcu_vahidi' => 'nullable|string|max:50',
-            'qiymet' => 'nullable|numeric|min:0',
-        ]);
-
-        Warehouse::create($request->all());
-
+        Warehouse::create($request->validated());
         return redirect()->route('warehouses.index')->with('success', 'Anbar məlumatı uğurla əlavə edildi!');
     }
 
@@ -69,20 +62,10 @@ class WarehouseController extends Controller
         return view('warehouses.edit', compact('warehouse'));
     }
 
-    public function update(Request $request, $id)
+    public function update(WarehouseUpdateRequest $request, $id)
     {
         $warehouse = Warehouse::findOrFail($id);
-
-        $request->validate([
-            'kod' => 'required|unique:warehouses,kod,' . $id,
-            'ad' => 'required|string|max:255',
-            'miqdar' => 'required|integer|min:0',
-            'olcu_vahidi' => 'nullable|string|max:50',
-            'qiymet' => 'nullable|numeric|min:0',
-        ]);
-
-        $warehouse->update($request->all());
-
+        $warehouse->update($request->validated());
         return redirect()->route('warehouses.index')->with('success', 'Anbar məlumatı uğurla yeniləndi!');
     }
 
@@ -90,7 +73,6 @@ class WarehouseController extends Controller
     {
         $warehouse = Warehouse::findOrFail($id);
         $warehouse->delete();
-
         return redirect()->route('warehouses.index')->with('success', 'Anbar məlumatı uğurla silindi!');
     }
 

@@ -16,7 +16,6 @@
 <div class="card mb-4">
     <div class="card-body">
         <div class="row g-3 align-items-end">
-            <!-- Sıralama -->
             <div class="col-md-3">
                 <label class="form-label fw-bold">📊 Sıralama</label>
                 <select class="form-select" id="sortSelect" onchange="applyFilters()">
@@ -26,7 +25,6 @@
                     <option value="dqn" {{ request('sort') == 'dqn' ? 'selected' : '' }}>DQN - ə görə</option>
                 </select>
             </div>
-            <!-- Sıra (Artan/Azalan) -->
             <div class="col-md-3">
                 <label class="form-label fw-bold">📈 Sıra</label>
                 <select class="form-select" id="orderSelect" onchange="applyFilters()">
@@ -34,7 +32,6 @@
                     <option value="desc" {{ request('order') == 'desc' ? 'selected' : '' }}>⬇ Azalan (Z-A / 9-0)</option>
                 </select>
             </div>
-            <!-- Axtarış -->
             <div class="col-md-6">
                 <label class="form-label fw-bold">🔍 Axtarış</label>
                 <div class="input-group">
@@ -79,7 +76,6 @@
 
     // Səhifə yükləndikdə mövcud filterləri tətbiq et
     document.addEventListener('DOMContentLoaded', function() {
-        // Əgər URL - də parametr varsa, onları seç
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('sort')) {
             document.getElementById('sortSelect').value = urlParams.get('sort');
@@ -90,7 +86,6 @@
         if (urlParams.has('search')) {
             document.getElementById('searchInput').value = urlParams.get('search');
         }
-        // applyFilters();
     });
 </script>
 @endsection
