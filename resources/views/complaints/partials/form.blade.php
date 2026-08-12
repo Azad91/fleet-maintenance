@@ -142,17 +142,36 @@
     <label class="form-label fw-bold">🏷️ Şikayət Tipi <span class="text-danger">*</span></label>
     <div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_qezali" value="qezali" {{ old('sikayet_tipi') == 'qezali' ? 'checked' : '' }} required>
+            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_qezali" value="qezali"
+                   {{ old('sikayet_tipi') == 'qezali' ? 'checked' : '' }} onchange="toggleServiceFields()" required>
             <label class="form-check-label" for="tip_qezali">🚗 Qəzalı</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_nasazliq" value="nasazliq" {{ old('sikayet_tipi') == 'nasazliq' ? 'checked' : '' }}>
+            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_nasazliq" value="nasazliq"
+                   {{ old('sikayet_tipi') == 'nasazliq' ? 'checked' : '' }} onchange="toggleServiceFields()">
             <label class="form-check-label" for="tip_nasazliq">⚠️ Nasazlıq</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_texniki" value="texniki_xidmet" {{ old('sikayet_tipi') == 'texniki_xidmet' ? 'checked' : '' }}>
+            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_texniki" value="texniki_xidmet"
+                   {{ old('sikayet_tipi') == 'texniki_xidmet' ? 'checked' : '' }} onchange="toggleServiceFields()">
             <label class="form-check-label" for="tip_texniki">🔧 Texniki Xidmət</label>
         </div>
+    </div>
+</div>
+
+<!-- Texniki Xidmət Seçimi -->
+<div id="serviceFields" style="display: none;">
+    <div class="mb-3">
+        <label for="service_template_id" class="form-label fw-bold">🔧 Baxım Növü <span class="text-danger">*</span></label>
+        <select class="form-select" id="service_template_id" name="service_template_id">
+            <option value="">Baxım növünü seçin...</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="service_km" class="form-label fw-bold">📊 Cari KM <span class="text-danger">*</span></label>
+        <input type="number" class="form-control" id="service_km" name="service_km" placeholder="Məs: 36000" min="0">
+        <small class="text-muted">Avtobusun cari yürüşünü daxil edin</small>
     </div>
 </div>
 
@@ -261,6 +280,11 @@
                         .then(response => response.json())
                         .then(kmData => {
                             document.getElementById('km').value = kmData.km || '';
+                            // Texniki xidmət seçilibsə, şablonları yüklə
+                            const selectedTip = document.querySelector('input[name="sikayet_tipi"]:checked');
+                            if (selectedTip && selectedTip.value === 'texniki_xidmet') {
+                                loadServiceTemplates(data.bus_id);
+                            }
                         })
                         .catch(error => console.error('KM xətası:', error));
                 }
@@ -294,7 +318,124 @@
         }
     }
 
-    // ==================== 3. DİNAMİK ŞİKAYƏT ====================
+    // ==================== 3. TEXNİKİ XİDMƏT ====================
+    function toggleServiceFields() {
+        const selectedTip = document.querySelector('input[name="sikayet_tipi"]:checked');
+        const serviceFields = document.getElementById('serviceFields');
+
+        if (selectedTip && selectedTip.value === 'texniki_xidmet') {
+            serviceFields.style.display = 'block';
+            // Avtobus seçilibsə, şablonları yüklə
+            const busId = document.getElementById('bus_id').value;
+            if (busId) {
+                loadServiceTemplates(busId);
+            }
+        } else {
+            serviceFields.style.display = 'none';
+            document.getElementById('service_template_id').innerHTML = '<option value="">Baxım növünü seçin...</option>';
+        }
+    }
+
+    function loadServiceTemplates(busId) {
+        if (!busId) return;
+
+        fetch(`/get-service-templates/${busId}`)
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('service_template_id');
+                select.innerHTML = '<option value="">Baxım növünü seçin...</option>';
+
+                data.forEach(template => {
+                    const option = document.createElement('option');
+                    option.value = template.id;
+                    option.dataset.details = JSON.stringify(template.details);
+                    option.textContent = `${template.name} (${template.km_interval} km)`;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Xəta:', error));
+    }
+
+    function fillDetallarFromTemplate(details) {
+        const container = document.getElementById('detallarContainer');
+        const firstItem = container.querySelector('.detallar-item');
+
+        // Birdən çox detal varsa, hamısını sil
+        while (container.children.length > 1) {
+            container.removeChild(container.lastChild);
+        }
+
+        // İlk detala məlumatları yaz
+        const firstInputs = firstItem.querySelectorAll('input');
+        const firstSelect = firstItem.querySelector('select');
+
+        if (firstSelect) {
+            firstSelect.value = '0';
+        }
+
+        if (details.length > 0) {
+            // İlk detalı doldur
+            const firstDetail = details[0];
+            firstInputs.forEach(input => {
+                if (input.name.includes('[kodu]')) {
+                    input.value = firstDetail.kodu || '';
+                    if (firstDetail.kodu) {
+                        getDetalByKod(input, 0);
+                    }
+                }
+                if (input.name.includes('[adi]')) {
+                    input.value = firstDetail.adi || '';
+                }
+                if (input.name.includes('[depo_miqdari]')) {
+                    input.value = firstDetail.miqdar || 0;
+                }
+                if (input.name.includes('[islenen_miqdar]')) {
+                    input.value = firstDetail.miqdar || 0;
+                }
+            });
+
+            // Qalan detalları əlavə et
+            for (let i = 1; i < details.length; i++) {
+                addDetal();
+                const items = container.querySelectorAll('.detallar-item');
+                const newItem = items[i];
+                const itemInputs = newItem.querySelectorAll('input');
+
+                itemInputs.forEach(input => {
+                    if (input.name.includes('[kodu]')) {
+                        input.value = details[i].kodu || '';
+                        if (details[i].kodu) {
+                            getDetalByKod(input, i);
+                        }
+                    }
+                    if (input.name.includes('[adi]')) {
+                        input.value = details[i].adi || '';
+                    }
+                    if (input.name.includes('[depo_miqdari]')) {
+                        input.value = details[i].miqdar || 0;
+                    }
+                    if (input.name.includes('[islenen_miqdar]')) {
+                        input.value = details[i].miqdar || 0;
+                    }
+                });
+            }
+        }
+    }
+
+    // Baxım növü seçildikdə detalları avtomatik doldur
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.id === 'service_template_id') {
+            const select = e.target;
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (selectedOption && selectedOption.dataset.details) {
+                const details = JSON.parse(selectedOption.dataset.details);
+                fillDetallarFromTemplate(details);
+            }
+        }
+    });
+
+    // ==================== 4. DİNAMİK ŞİKAYƏT ====================
     function addShikayet() {
         const container = document.getElementById('shikayetContainer');
         const items = container.querySelectorAll('.shikayet-item');
@@ -339,7 +480,7 @@
         });
     }
 
-    // ==================== 4. DİNAMİK DETALLAR ====================
+    // ==================== 5. DİNAMİK DETALLAR ====================
     let detalCount = 1;
 
     function addDetal() {
@@ -427,7 +568,7 @@
         }
     }
 
-    // ==================== 5. DETALLARIN SEÇİMLƏRİNİ YENİLƏ ====================
+    // ==================== 6. DETALLARIN SEÇİMLƏRİNİ YENİLƏ ====================
     function updateDetalOptions() {
         const shikayetSelects = document.querySelectorAll('select[name="shikayet[]"]');
         const detalSelects = document.querySelectorAll('select[name*="[shikayet_index]"]');
@@ -462,7 +603,7 @@
         }
     });
 
-    // ==================== 6. DETAL KODUNA GÖRƏ ANBAR - DAN MƏLUMAT ÇƏK ====================
+    // ==================== 7. DETAL KODUNA GÖRƏ ANBAR - DAN MƏLUMAT ÇƏK ====================
     function getDetalByKod(input, index) {
         const kod = input.value;
         const item = input.closest('.detallar-item');
@@ -484,7 +625,7 @@
             .catch(error => console.error('Xəta:', error));
     }
 
-    // ==================== 7. SƏHİFƏ YÜKLƏNDİKDƏ ====================
+    // ==================== 8. SƏHİFƏ YÜKLƏNDİKDƏ ====================
     document.addEventListener('DOMContentLoaded', function() {
         toggleFields();
     });

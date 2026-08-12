@@ -7,6 +7,7 @@ use App\Http\Requests\ComplaintUpdateRequest;
 use App\Models\Bus;
 use App\Models\Complaint;
 use App\Models\ComplaintType;
+use App\Models\ServiceTemplate;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -94,6 +95,14 @@ class ComplaintController extends Controller
             $data['detallar'] = null;
         }
 
+        // Texniki xidmət məlumatlarını saxla
+        if ($request->has('service_template_id')) {
+            $data['service_template_id'] = $request->service_template_id;
+        }
+        if ($request->has('service_km')) {
+            $data['service_km'] = $request->service_km;
+        }
+
         Complaint::create($data);
         return redirect()->route('complaints.index')->with('success', 'Şikayət uğurla əlavə edildi!');
     }
@@ -153,10 +162,19 @@ class ComplaintController extends Controller
             $complaint->detallar = null;
         }
 
+        // Texniki xidmət məlumatlarını yenilə
+        if ($request->has('service_template_id')) {
+            $complaint->service_template_id = $request->service_template_id;
+        }
+        if ($request->has('service_km')) {
+            $complaint->service_km = $request->service_km;
+        }
+
         $complaint->save();
 
         return redirect('/complaints')->with('success', 'Şikayət uğurla yeniləndi!');
     }
+
     public function destroy($id)
     {
         $complaint = Complaint::findOrFail($id);

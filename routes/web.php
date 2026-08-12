@@ -208,3 +208,38 @@ Route::get('get-bus-km-by-id/{bus_id}', function ($bus_id) {
     $bus = App\Models\Bus::find($bus_id);
     return response()->json(['km' => $bus ? $bus->km : null]);
 })->name('get.bus.km.by.id');
+
+Route::get('get-service-templates/{bus_id}', function ($bus_id) {
+    $bus = App\Models\Bus::find($bus_id);
+    if (!$bus) {
+        return response()->json([]);
+    }
+
+    // Bütün şablonları götür
+    $templates = App\Models\ServiceTemplate::all();
+
+    // Hər şablon üçün avtobusun fərdi intervalını yoxla
+    $result = $templates->map(function ($template) use ($bus) {
+        $interval = App\Models\BusServiceInterval::where('bus_id', $bus->id)
+            ->where('service_template_id', $template->id)
+            ->first();
+
+        return [
+            'id' => $template->id,
+            'name' => $template->name,
+            'km_interval' => $interval ? $interval->custom_km_interval : $template->default_km_interval,
+            'details' => $template->details,
+        ];
+    });
+
+    return response()->json($result);
+})->name('get.service.templates');
+
+use App\Http\Controllers\MotorOilController;
+
+Route::prefix('motor-oil')->name('motor-oil.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/import', [MotorOilController::class, 'importForm'])->name('import');
+    Route::post('/import', [MotorOilController::class, 'import'])->name('import.store');
+});
+Route::get('/motor-oil', [MotorOilController::class, 'index'])->name('motor-oil.index');
+Route::get('/motor-oil/search', [MotorOilController::class, 'search'])->name('motor-oil.search');
