@@ -1,43 +1,39 @@
 /* ============================================
-   1. ÜMUMİ (GLOBAL) STILLƏR
+   APP CONTAINER
    ============================================ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background: #f4f6f9;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.app-container {
+    display: flex;
+    min-height: 100vh;
 }
 
 /* ============================================
-   2. SIDEBAR
+   SIDEBAR (SOLDAN SABİT)
    ============================================ */
 .sidebar {
-    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
     background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
     padding-top: 20px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
     overflow-y: auto;
+    z-index: 1000;
 }
 
 .sidebar .brand {
     color: white;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
-    padding: 15px 25px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 15px;
-    letter-spacing: 0.5px;
+    padding: 10px 25px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .sidebar .brand i {
     color: #4CAF50;
-    margin-right: 10px;
+    font-size: 28px;
 }
 
 .sidebar a {
@@ -85,10 +81,31 @@ body {
     font-weight: 600;
 }
 
+.sidebar .btn-danger {
+    background: #dc3545;
+    border: none;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 10px;
+    margin: 4px 12px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    width: calc(100% - 24px);
+}
+
+.sidebar .btn-danger:hover {
+    background: #c82333;
+    transform: translateX(5px);
+}
+
 /* ============================================
-   3. CONTENT
+   CONTENT (SAĞDA)
    ============================================ */
 .content {
+    margin-left: 250px;    /* SADƏC BUNU ƏLAVƏ ET! */
     padding: 30px;
     min-height: 100vh;
     background: #f4f6f9;
@@ -204,8 +221,8 @@ body {
 }
 
 .badge-status.gözləmədə {
-    background: #ffc107;
-    color: #000;
+    background: #6c757d;
+    color: #fff;
 }
 
 .badge-status.işdə {
@@ -231,6 +248,11 @@ body {
 .badge-status.temir {
     background: #ffc107;
     color: #000;
+}
+
+.badge-status.göstənmədə {
+    background: #6c757d;
+    color: #fff;
 }
 
 /* ============================================
@@ -408,17 +430,26 @@ body {
 /* ============================================
    12. RESPONSİVLİK
    ============================================ */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 200px;
+    }
+    .content {
+        margin-left: 200px;
+    }
+}
+
 @media (max-width: 768px) {
     .sidebar {
-        min-height: auto;
-        height: auto;
         position: relative;
+        width: 100%;
+        height: auto;
+        min-height: auto;
     }
-
     .content {
+        margin-left: 0;
         padding: 15px;
     }
-
     .stat-card .count {
         font-size: 22px;
     }
@@ -649,7 +680,153 @@ body {
     margin-bottom: 0;
 }
 
-.badge-status.gözləmədə {
-    background: #6c757d;
+/* ============================================
+   15. FORM KÖMƏKÇİ SİNFLƏR
+   ============================================ */
+
+/* Şikayət nömrəsi - input-group üçün */
+.shikayet-number {
+    min-width: 40px;
+}
+
+/* Disabled / Readonly inputlar */
+.input-disabled {
+    background: #e9ecef !important;
+    cursor: not-allowed !important;
+}
+
+/* Detallar üçün kart */
+.detallar-item {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 10px;
+}
+
+/* Service Fields - gizlətmək üçün */
+.service-fields-hidden {
+    display: none;
+}
+
+/* Fieldset üçün */
+.field {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.field .label {
+    font-weight: 600;
+    color: #555;
+    width: 180px;
+    flex-shrink: 0;
+}
+
+.field .value {
+    color: #1a1a2e;
+    flex: 1;
+}
+
+/* Detail cards */
+.detail-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 10px;
+    background: #f8f9fa;
+}
+
+.detail-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 8px;
+}
+
+.detail-item {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Status badge - aktiv/passiv */
+.active-yes {
+    color: #198754;
+    font-weight: 600;
+}
+
+.active-no {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+/* Badge - işlənib / işlənməyib */
+.badge-islenib {
+    background: #198754;
     color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.badge-islenmeyib {
+    background: #dc3545;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.badge-qezali {
+    background: #dc3545;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.badge-texniki {
+    background: #0d6efd;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.badge-nasazliq {
+    background: #ffc107;
+    color: #000;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+/* Status - anbar */
+.status-empty {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.status-low {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.status-good {
+    color: #198754;
+    font-weight: 600;
+}
+
+/* Welcome səhifəsi */
+.btn-group-custom {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.footer-text {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+    margin-top: 20px;
 }

@@ -6,22 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('complaints', function (Blueprint $table) {
             $table->foreignId('service_template_id')->nullable()->constrained()->onDelete('set null');
         });
     }
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::table('complaints', function (Blueprint $table) {
-            //
+            $table->dropConstrainedForeignId('service_template_id');
         });
     }
 };

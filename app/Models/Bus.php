@@ -10,26 +10,19 @@ class Bus extends Model
     use HasFactory;
 
     protected $fillable = [
-        'xett_no',
-        'dqn',
-        'shikayet',
-        'bildirilme_tarix',
-        'bildirilme_saat',
-        'is_baslama_tarix',
-        'is_baslama_saat',
-        'is_bitme_tarix',
-        'is_bitme_saat',
-        'surucu_adi',
-        'detallar',
-        'aktiv',
-        'km',
+    'xett_no',
+    'dqn',
+    'shikayet',
+    'tarix',           // SADƏC TARİX QALDI
+    'surucu_adi',
+    'detallar',
+    'aktiv',
+    'km',
     ];
 
     protected $casts = [
         'aktiv' => 'boolean',
-        'bildirilme_tarix' => 'date',
-        'is_baslama_tarix' => 'date',
-        'is_bitme_tarix' => 'date',
+        'tarix' => 'date',       // <--- BU VAR
         'detallar' => 'array',
         'km' => 'integer',
     ];

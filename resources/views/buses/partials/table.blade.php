@@ -8,6 +8,7 @@
                         <th>Xətt №</th>
                         <th>DQN</th>
                         <th>KM (Yürüş)</th>
+                        <th>Tarix</th>
                         <th>Status</th>
                         <th>Əməliyyatlar</th>
                     </tr>
@@ -19,6 +20,7 @@
                         <td>{{ $bus->xett_no ?? '-' }}</td>
                         <td><strong>{{ $bus->dqn }}</strong></td>
                         <td>{{ $bus->km ? number_format($bus->km, 0, ',', '.') . ' km' : '-' }}</td>
+                        <td>{{ $bus->tarix ? \Carbon\Carbon::parse($bus->tarix)->format('d.m.Y') : '-' }}</td>
                         <td>
                             <span class="badge-status {{ $bus->aktiv ? 'aktiv' : 'passiv' }}">
                                 {{ $bus->aktiv ? '✅ Aktiv' : '❌ Passiv' }}
@@ -40,7 +42,7 @@
                     </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">
+                            <td colspan="7" class="text-center text-muted py-4">
                                 <i class="bi bi-bus-front" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
                                 @if(isset($search) && $search)
                                     "<strong>{{ $search }}</strong>" üzrə heç nə tapılmadı

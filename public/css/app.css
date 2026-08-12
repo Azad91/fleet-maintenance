@@ -19,20 +19,7 @@ body {
     min-height: 100vh;
     background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
     padding-top: 20px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
     overflow-y: auto;
-}
-
-.sidebar .brand {
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
-    padding: 15px 25px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 15px;
-    letter-spacing: 0.5px;
 }
 
 .sidebar .brand i {
@@ -204,8 +191,8 @@ body {
 }
 
 .badge-status.gözləmədə {
-    background: #ffc107;
-    color: #000;
+    background: #6c757d;
+    color: #fff;
 }
 
 .badge-status.işdə {
@@ -231,6 +218,11 @@ body {
 .badge-status.temir {
     background: #ffc107;
     color: #000;
+}
+
+.badge-status.göstənmədə {
+    background: #6c757d;
+    color: #fff;
 }
 
 /* ============================================

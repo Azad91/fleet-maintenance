@@ -10,30 +10,25 @@ class Complaint extends Model
     use HasFactory;
 
     protected $fillable = [
-        'bus_id',
-        'yer',
-        'surucu_adi',
-        'shikayet',
-        'sikayet_tipi',
-        'bildirilme_tarix',
-        'bildirilme_saat',
-        'is_baslama_tarix',
-        'is_baslama_saat',
-        'is_bitme_tarix',
-        'is_bitme_saat',
-        'status',
-        'detallar',  // JSON - da qeyd saxlanılır
-        'km',
-        // 'qeyd',  // SİLİNDİ
-        'kim_is_gorub',
+    'bus_id',
+    'yer',
+    'surucu_adi',
+    'shikayet',
+    'sikayet_tipi',
+    'tarix',              // SADƏC TARİX
+    'status',
+    'detallar',
+    'km',
+    'kim_is_gorub',
+    'service_template_id',
+    'service_km',
     ];
 
     protected $casts = [
-        'bildirilme_tarix' => 'date',
-        'is_baslama_tarix' => 'date',
-        'is_bitme_tarix' => 'date',
+        'tarix' => 'date',
         'detallar' => 'array',
         'km' => 'integer',
+        'service_km' => 'integer',
     ];
 
     // ==================== RELATIONSHIPS ====================

@@ -17,6 +17,7 @@ class BusStoreRequest extends FormRequest
             'xett_no' => 'nullable|string|max:255',
             'dqn' => 'required|unique:buses,dqn',
             'km' => 'nullable|integer|min:0',
+            // 'tarix' - YOXDUR, avtomatik dolur
         ];
     }
 }

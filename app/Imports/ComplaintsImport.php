@@ -51,7 +51,6 @@ class ComplaintsImport implements OnEachRow, WithHeadingRow, WithValidation
             'depo_miqdari' => $depo_miqdari,
             'islenen_miqdar' => $rowArray['islenen_miqdar'] ?? null,
             'km' => $rowArray['km'] ?? null,
-            'qeyd' => $rowArray['qeyd'] ?? null,
             'kim_is_gorub' => $rowArray['kim_is_gorub'] ?? null,
         ]);
     }

@@ -50,7 +50,9 @@ class BusController extends Controller
 
     public function store(BusStoreRequest $request)
     {
-        Bus::create($request->validated());
+        $data = $request->validated();
+        $data['tarix'] = now()->format('Y-m-d');  // <--- BUNU ƏLAVƏ ET
+        Bus::create($data);
         return redirect()->route('buses.index')->with('success', 'Avtobus uğurla əlavə edildi!');
     }
 
@@ -66,7 +68,9 @@ class BusController extends Controller
     public function update(BusUpdateRequest $request, $id)
     {
         $bus = Bus::findOrFail($id);
-        $bus->update($request->validated());
+        $data = $request->validated();
+        $data['tarix'] = now()->format('Y-m-d');  // <--- BUNU ƏLAVƏ ET
+        $bus->update($data);
         return redirect()->route('buses.index')->with('success', 'Avtobus uğurla yeniləndi!');
     }
 

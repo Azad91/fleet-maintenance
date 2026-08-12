@@ -13,7 +13,7 @@
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0">
-            <!-- Sidebar -->
+            <!-- SIDEBAR -->
             <div class="col-md-2 sidebar">
                 <div class="brand">
                     <i class="bi bi-car-front-fill"></i> Fleet
@@ -48,8 +48,15 @@
                         </a>
                     @endif
 
+                    @if($role == 'admin')
+                        <div class="nav-label">Texniki Xidmət</div>
+                        <a href="{{ route('motor-oil.index') }}" class="{{ request()->routeIs('motor-oil.*') ? 'active' : '' }}">
+                            <i class="bi bi-droplet"></i> Motor Yağ
+                        </a>
+                    @endif
+
                     @if($role == 'directorate')
-                        <div class="nav-label text-warning mt-3" style="color:#ffc107 !important;">
+                        <div class="nav-label text-warning mt-3">
                             <i class="bi bi-eye"></i> Yalnız Baxış
                         </div>
                     @endif
@@ -62,14 +69,14 @@
                     <hr>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="btn btn-danger w-100" style="border-radius:10px;">
+                        <button type="submit" class="btn btn-danger">
                             <i class="bi bi-box-arrow-right"></i> Çıxış
                         </button>
                     </form>
                 @endauth
             </div>
 
-            <!-- Content -->
+            <!-- CONTENT -->
             <div class="col-md-10 content">
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">

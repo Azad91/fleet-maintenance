@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class ComplaintUpdateRequest extends FormRequest
+class ProfileUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -13,23 +14,11 @@ class ComplaintUpdateRequest extends FormRequest
 
     public function rules(): array
     {
+        $userId = $this->user()->id;
+
         return [
-            'bus_id' => 'required|exists:buses,id',
-            'yer' => 'nullable|string|in:yol,qaraj',
-            'surucu_adi' => 'nullable|string|max:255',
-            'shikayet' => 'nullable|array',
-            'shikayet.*' => 'nullable|string|max:1000',
-            'sikayet_tipi' => 'nullable|in:qezali,texniki_xidmet,nasazliq',
-            'bildirilme_tarix' => 'nullable|date',
-            'bildirilme_saat' => 'nullable|date_format:H:i',
-            'is_baslama_tarix' => 'nullable|date',
-            'is_baslama_saat' => 'nullable|date_format:H:i',
-            'is_bitme_tarix' => 'nullable|date',
-            'is_bitme_saat' => 'nullable|date_format:H:i',
-            'status' => 'required|in:gözləmədə,işdə,həll olundu',
-            'km' => 'nullable|integer|min:0',
-            'qeyd' => 'nullable|string',
-            'kim_is_gorub' => 'nullable|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
         ];
     }
 }

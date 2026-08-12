@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('service_templates', function (Blueprint $table) {
-            $table->boolean('is_motor_oil')->default(false);
+        Schema::table('buses', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('service_templates', function (Blueprint $table) {
+        Schema::table('buses', function (Blueprint $table) {
             //
         });
     }

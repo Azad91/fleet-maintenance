@@ -53,12 +53,20 @@ class ComplaintController extends Controller
         return view('complaints.partials.table', compact('complaints', 'dqn', 'xett_no', 'yer', 'shikayet'));
     }
 
-    public function create()
-    {
-        $buses = Bus::orderBy('xett_no')->get();
-        $complaintTypes = ComplaintType::orderBy('name')->get();
-        return view('complaints.create', compact('buses', 'complaintTypes'));
-    }
+public function create()
+{
+    $buses = Bus::orderBy('xett_no')->get();
+    $complaintTypes = ComplaintType::orderBy('name')->get();
+
+    // BÜTÜN ŞABLONLARI GÖTÜR (heç bir filtr olmadan)
+    $serviceTemplates = ServiceTemplate::orderBy('default_km_interval', 'asc')->get();
+
+    return view('complaints.create', compact(
+        'buses',
+        'complaintTypes',
+        'serviceTemplates'
+    ));
+}
 
     public function store(ComplaintStoreRequest $request)
     {

@@ -25,48 +25,8 @@
         <span class="value">{{ $bus->km ? number_format($bus->km, 0, ',', '.') . ' km' : '-' }}</span>
     </div>
     <div class="field">
-        <span class="label">📊 Son KM (Yürüş):</span>
-        <span class="value">
-            @php
-                $lastKm = App\Models\DailyKm::where('bus_id', $bus->id)->orderBy('tarix', 'desc')->first();
-            @endphp
-            {{ $lastKm ? number_format($lastKm->km, 0, ',', '.') . ' km (' . $lastKm->tarix->format('d.m.Y') . ')' : '-' }}
-        </span>
-    </div>
-    <div class="field">
-        <span class="label">Sürücü:</span>
-        <span class="value">{{ $bus->surucu_adi ?? '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">Şikayət:</span>
-        <span class="value">{{ $bus->shikayet ?? '-' }}</span>
-    </div>
-
-    <div class="section-title">🕐 Tarix və Saat</div>
-
-    <div class="field">
-        <span class="label">Bildirilme Tarix:</span>
-        <span class="value">{{ $bus->bildirilme_tarix ? $bus->bildirilme_tarix->format('d.m.Y') : '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">Bildirilme Saat:</span>
-        <span class="value">{{ $bus->bildirilme_saat ?? '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">İşə Başlama Tarix:</span>
-        <span class="value">{{ $bus->is_baslama_tarix ? $bus->is_baslama_tarix->format('d.m.Y') : '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">İşə Başlama Saat:</span>
-        <span class="value">{{ $bus->is_baslama_saat ?? '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">İşin Bitdiyi Tarix:</span>
-        <span class="value">{{ $bus->is_bitme_tarix ? $bus->is_bitme_tarix->format('d.m.Y') : '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">İşin Bitdiyi Saat:</span>
-        <span class="value">{{ $bus->is_bitme_saat ?? '-' }}</span>
+        <span class="label">📅 Tarix:</span>
+        <span class="value">{{ $bus->tarix ? \Carbon\Carbon::parse($bus->tarix)->format('d.m.Y') : '-' }}</span>
     </div>
 
     <div class="section-title">📊 Status</div>

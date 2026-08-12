@@ -15,7 +15,8 @@ class BusesImport implements ToModel, WithHeadingRow, WithValidation
             ['dqn' => $row['dqn']],
             [
                 'xett_no' => $row['xett_no'] ?? null,
-                'km' => $row['km'] ?? null,   // YENİ
+                'km' => $row['km'] ?? null,
+                'tarix' => now()->format('Y-m-d'),  // <--- BUNU ƏLAVƏ ET
             ]
         );
     }

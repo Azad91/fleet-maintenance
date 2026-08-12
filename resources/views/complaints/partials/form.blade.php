@@ -1,7 +1,44 @@
-<!-- Avtobus seçimi -->
+<!-- ==================== 1. ŞİKAYƏT TİPİ ==================== -->
+<div class="mb-3">
+    <label class="form-label fw-bold">🏷️ Şikayət Tipi <span class="text-danger">*</span></label>
+    <div>
+        <div class="form-check form-check-inline me-3">
+            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_qezali" value="qezali"
+                   {{ old('sikayet_tipi') == 'qezali' ? 'checked' : '' }} onchange="toggleServiceFields()" required>
+            <label class="form-check-label" for="tip_qezali">🚗 Qəzalı</label>
+        </div>
+        <div class="form-check form-check-inline me-3">
+            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_nasazliq" value="nasazliq"
+                   {{ old('sikayet_tipi') == 'nasazliq' ? 'checked' : '' }} onchange="toggleServiceFields()">
+            <label class="form-check-label" for="tip_nasazliq">⚠️ Nasazlıq</label>
+        </div>
+        <div class="form-check form-check-inline me-3">
+            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_texniki" value="texniki_xidmet"
+                   {{ old('sikayet_tipi') == 'texniki_xidmet' ? 'checked' : '' }} onchange="toggleServiceFields()">
+            <label class="form-check-label" for="tip_texniki">🔧 Texniki Xidmət</label>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 2. YOL / QARAJ ==================== -->
+<div class="mb-3">
+    <label class="form-label fw-bold">📍 Yer <span class="text-danger">*</span></label>
+    <div>
+        <div class="form-check form-check-inline me-3">
+            <input class="form-check-input" type="radio" name="yer" id="yer_yol" value="yol" {{ old('yer', 'yol') == 'yol' ? 'checked' : '' }} onchange="toggleFields()" required>
+            <label class="form-check-label" for="yer_yol">🛣️ Yol</label>
+        </div>
+        <div class="form-check form-check-inline me-3">
+            <input class="form-check-input" type="radio" name="yer" id="yer_qaraj" value="qaraj" {{ old('yer') == 'qaraj' ? 'checked' : '' }} onchange="toggleFields()">
+            <label class="form-check-label" for="yer_qaraj">🏠 Qaraj</label>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 3. AVTOBUS SEÇİMİ ==================== -->
 <div class="mb-3">
     <label class="form-label fw-bold">🚌 Avtobus <span class="text-danger">*</span></label>
-    <div class="row">
+    <div class="row g-3">
         <div class="col-md-6">
             <label for="xett_no" class="form-label">Xətt № <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="xett_no" name="xett_no" required
@@ -15,40 +52,25 @@
         </div>
         <div class="col-md-6">
             <label for="dqn" class="form-label">DQN <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="dqn" name="dqn" readonly required style="background:#e9ecef;" value="{{ old('dqn') }}">
+            <input type="text" class="form-control input-disabled" id="dqn" name="dqn" readonly required value="{{ old('dqn') }}">
             <input type="hidden" name="bus_id" id="bus_id" value="{{ old('bus_id') }}">
         </div>
     </div>
 </div>
 
-<!-- Yol / Qaraj seçimi -->
-<div class="mb-3">
-    <label class="form-label fw-bold">📍 Yer <span class="text-danger">*</span></label>
-    <div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="yer" id="yer_yol" value="yol" {{ old('yer', 'yol') == 'yol' ? 'checked' : '' }} onchange="toggleFields()" required>
-            <label class="form-check-label" for="yer_yol">🛣️ Yol</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="yer" id="yer_qaraj" value="qaraj" {{ old('yer') == 'qaraj' ? 'checked' : '' }} onchange="toggleFields()">
-            <label class="form-check-label" for="yer_qaraj">🏠 Qaraj</label>
-        </div>
-    </div>
-</div>
-
-<!-- Sürücü adı -->
+<!-- ==================== 4. SÜRÜCÜ ADI ==================== -->
 <div class="mb-3" id="surucuField">
     <label for="surucu_adi" class="form-label fw-bold">🧑‍✈️ Sürücü Adı</label>
     <input type="text" class="form-control" id="surucu_adi" name="surucu_adi"
            placeholder="Məs: Elşad Məmmədov" value="{{ old('surucu_adi') }}">
 </div>
 
-<!-- Dinamik Şikayətlər -->
+<!-- ==================== 5. DİNAMİK ŞİKAYƏTLƏR ==================== -->
 <div class="mb-3">
     <label class="form-label fw-bold">📝 Şikayətlər <span class="text-danger">*</span></label>
     <div id="shikayetContainer">
         <div class="shikayet-item input-group mb-2">
-            <span class="input-group-text" style="min-width: 40px;">1.</span>
+            <span class="input-group-text shikayet-number">1.</span>
             <select class="form-select" name="shikayet[]" required>
                 <option value="">Şikayət seçin...</option>
                 @foreach($complaintTypes as $type)
@@ -66,17 +88,17 @@
     <small class="text-muted d-block mt-1">Hər şikayət ayrıca seçilir.</small>
 </div>
 
-<!-- KM -->
+<!-- ==================== 6. KM (Yürüş) ==================== -->
 <div class="mb-3">
     <label for="km" class="form-label fw-bold">📊 KM (Yürüş) <span class="text-danger">*</span></label>
     <input type="number" class="form-control" id="km" name="km" required
-           placeholder="Avtobus seçildikdə avtomatik dolur..." min="0" readonly style="background:#e9ecef;" value="{{ old('km') }}">
-    <small class="text-muted">Avtobus seçildikdə avtomatik olaraq dolur</small>
+           placeholder="Avtobus seçildikdə avtomatik dolur..." min="0" value="{{ old('km') }}">
+    <small class="text-muted">Avtobus seçildikdə avtomatik olaraq dolur, istəsən dəyişə bilərsən.</small>
 </div>
 
-<!-- Bildirilme -->
+<!-- ==================== 7. BİLDİRİLMƏ ==================== -->
 <div id="bildirilmeFields">
-    <div class="row">
+    <div class="row g-3">
         <div class="col-md-6">
             <div class="mb-3">
                 <label for="bildirilme_tarix" class="form-label fw-bold">📅 Bildirilme Tarix</label>
@@ -94,8 +116,8 @@
     </div>
 </div>
 
-<!-- İşə başlama -->
-<div class="row">
+<!-- ==================== 8. İŞƏ BAŞLAMA ==================== -->
+<div class="row g-3">
     <div class="col-md-6">
         <div class="mb-3">
             <label for="is_baslama_tarix" class="form-label fw-bold">📅 İşə Başlama Tarix <span class="text-danger">*</span></label>
@@ -110,8 +132,8 @@
     </div>
 </div>
 
-<!-- İşin bitməsi -->
-<div class="row">
+<!-- ==================== 9. İŞİN BİTMƏSİ ==================== -->
+<div class="row g-3">
     <div class="col-md-6">
         <div class="mb-3">
             <label for="is_bitme_tarix" class="form-label fw-bold">📅 İşin Bitdiyi Tarix <span class="text-danger">*</span></label>
@@ -126,7 +148,7 @@
     </div>
 </div>
 
-<!-- Status -->
+<!-- ==================== 10. STATUS ==================== -->
 <div class="mb-3">
     <label for="status" class="form-label fw-bold">📊 Status <span class="text-danger">*</span></label>
     <select class="form-select" id="status" name="status" required>
@@ -137,50 +159,31 @@
     </select>
 </div>
 
-<!-- Şikayət Tipi -->
-<div class="mb-3">
-    <label class="form-label fw-bold">🏷️ Şikayət Tipi <span class="text-danger">*</span></label>
-    <div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_qezali" value="qezali"
-                   {{ old('sikayet_tipi') == 'qezali' ? 'checked' : '' }} onchange="toggleServiceFields()" required>
-            <label class="form-check-label" for="tip_qezali">🚗 Qəzalı</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_nasazliq" value="nasazliq"
-                   {{ old('sikayet_tipi') == 'nasazliq' ? 'checked' : '' }} onchange="toggleServiceFields()">
-            <label class="form-check-label" for="tip_nasazliq">⚠️ Nasazlıq</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sikayet_tipi" id="tip_texniki" value="texniki_xidmet"
-                   {{ old('sikayet_tipi') == 'texniki_xidmet' ? 'checked' : '' }} onchange="toggleServiceFields()">
-            <label class="form-check-label" for="tip_texniki">🔧 Texniki Xidmət</label>
-        </div>
-    </div>
-</div>
-
-<!-- Texniki Xidmət Seçimi -->
-<div id="serviceFields" style="display: none;">
+<!-- ==================== 11. TEXNİKİ XİDMƏT ==================== -->
+<div id="serviceFields" class="service-fields-hidden">
     <div class="mb-3">
-        <label for="service_template_id" class="form-label fw-bold">🔧 Baxım Növü <span class="text-danger">*</span></label>
-        <select class="form-select" id="service_template_id" name="service_template_id">
+        <label for="service_template_id" class="form-label fw-bold">🔧 Baxım Növü</label>
+        <select class="form-select" id="service_template_id" name="service_template_id" onchange="onServiceSelectChange()">
             <option value="">Baxım növünü seçin...</option>
         </select>
     </div>
 
     <div class="mb-3">
-        <label for="service_km" class="form-label fw-bold">📊 Cari KM <span class="text-danger">*</span></label>
+        <label for="service_km" class="form-label fw-bold">📊 Cari KM</label>
         <input type="number" class="form-control" id="service_km" name="service_km" placeholder="Məs: 36000" min="0">
         <small class="text-muted">Avtobusun cari yürüşünü daxil edin</small>
     </div>
 </div>
 
-<!-- Detallar -->
+<!-- ==================== HIDDEN INPUT ==================== -->
+<input type="hidden" name="service_template_id" id="service_template_id_hidden">
+
+<!-- ==================== 12. DETALLAR ==================== -->
 <div class="card bg-light p-3 mb-3">
     <h5 class="fw-bold mb-3">🔧 İstifadə Olunan Detallar <span class="text-danger">*</span></h5>
     <div id="detallarContainer">
-        <div class="detallar-item border rounded p-3 mb-2">
-            <div class="row">
+        <div class="detallar-item">
+            <div class="row g-3">
                 <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Aid Olduğu Şikayət <span class="text-danger">*</span></label>
@@ -199,15 +202,13 @@
                 <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Detal Adı <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="detallar[0][adi]" required
-                               readonly disabled style="background:#e9ecef; cursor:not-allowed;" value="{{ old('detallar.0.adi') }}">
+                        <input type="text" class="form-control input-disabled" name="detallar[0][adi]" required readonly disabled value="{{ old('detallar.0.adi') }}">
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Depo Miqdarı <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="detallar[0][depo_miqdari]" required
-                               readonly disabled style="background:#e9ecef; cursor:not-allowed;" value="{{ old('detallar.0.depo_miqdari') }}">
+                        <input type="text" class="form-control input-disabled" name="detallar[0][depo_miqdari]" required readonly disabled value="{{ old('detallar.0.depo_miqdari') }}">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -242,13 +243,13 @@
     <small class="text-muted d-block mt-1">Hər detal hansı şikayətə aid olduğunu seçin.</small>
 </div>
 
-<!-- Kim iş görüb -->
+<!-- ==================== 13. KİM İŞ GÖRÜB ==================== -->
 <div class="mb-3">
     <label for="kim_is_gorub" class="form-label fw-bold">👤 Kim iş görüb <span class="text-danger">*</span></label>
     <input type="text" class="form-control" id="kim_is_gorub" name="kim_is_gorub" required placeholder="İşçi adı" value="{{ old('kim_is_gorub') }}">
 </div>
 
-<!-- Düymələr -->
+<!-- ==================== 14. DÜYMƏLƏR ==================== -->
 <div class="d-flex gap-2">
     <button type="submit" class="btn btn-success">
         <i class="bi bi-save"></i> Yadda Saxla
@@ -258,6 +259,8 @@
     </a>
 </div>
 
+
+<!-- ==================== SCRIPTS ==================== -->
 @section('scripts')
 <script>
     // ==================== 1. AVTOBUS ====================
@@ -266,6 +269,7 @@
             document.getElementById('dqn').value = '';
             document.getElementById('bus_id').value = '';
             document.getElementById('km').value = '';
+            document.getElementById('service_template_id').innerHTML = '<option value="">Baxım növünü seçin...</option>';
             return;
         }
 
@@ -279,8 +283,9 @@
                     fetch(`/get-bus-km-by-id/${data.bus_id}`)
                         .then(response => response.json())
                         .then(kmData => {
-                            document.getElementById('km').value = kmData.km || '';
-                            // Texniki xidmət seçilibsə, şablonları yüklə
+                            const km = kmData.km || '';
+                            document.getElementById('km').value = km;
+
                             const selectedTip = document.querySelector('input[name="sikayet_tipi"]:checked');
                             if (selectedTip && selectedTip.value === 'texniki_xidmet') {
                                 loadServiceTemplates(data.bus_id);
@@ -304,14 +309,12 @@
         if (yer === 'qaraj') {
             surucuField.style.display = 'none';
             bildirilmeFields.style.display = 'none';
-            // Required - i söndür
             surucuInput.removeAttribute('required');
             bildirilmeTarix.removeAttribute('required');
             bildirilmeSaat.removeAttribute('required');
         } else {
             surucuField.style.display = 'block';
             bildirilmeFields.style.display = 'block';
-            // Required - i aktivləşdir
             surucuInput.setAttribute('required', 'required');
             bildirilmeTarix.setAttribute('required', 'required');
             bildirilmeSaat.setAttribute('required', 'required');
@@ -324,14 +327,13 @@
         const serviceFields = document.getElementById('serviceFields');
 
         if (selectedTip && selectedTip.value === 'texniki_xidmet') {
-            serviceFields.style.display = 'block';
-            // Avtobus seçilibsə, şablonları yüklə
+            serviceFields.classList.remove('service-fields-hidden');
             const busId = document.getElementById('bus_id').value;
             if (busId) {
                 loadServiceTemplates(busId);
             }
         } else {
-            serviceFields.style.display = 'none';
+            serviceFields.classList.add('service-fields-hidden');
             document.getElementById('service_template_id').innerHTML = '<option value="">Baxım növünü seçin...</option>';
         }
     }
@@ -339,19 +341,36 @@
     function loadServiceTemplates(busId) {
         if (!busId) return;
 
-        fetch(`/get-service-templates/${busId}`)
+        const currentKm = parseInt(document.getElementById('km').value) || 0;
+
+        fetch('/get-service-templates/' + busId)
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('service_template_id');
                 select.innerHTML = '<option value="">Baxım növünü seçin...</option>';
 
+                data.sort((a, b) => a.km_interval - b.km_interval);
+
                 data.forEach(template => {
-                    const option = document.createElement('option');
-                    option.value = template.id;
-                    option.dataset.details = JSON.stringify(template.details);
-                    option.textContent = `${template.name} (${template.km_interval} km)`;
-                    select.appendChild(option);
+                    if (template.details && template.details.length > 0 && template.km_interval > currentKm) {
+                        const option = document.createElement('option');
+                        option.value = template.id;
+                        const kmFormatted = new Intl.NumberFormat('az').format(template.km_interval);
+                        option.textContent = template.name + ' (' + kmFormatted + ' km)';
+                        option.dataset.km = template.km_interval;
+                        option.dataset.details = JSON.stringify(template.details);
+                        select.appendChild(option);
+                    }
                 });
+
+                if (select.options.length <= 1) {
+                    const emptyOption = document.createElement('option');
+                    emptyOption.value = '';
+                    emptyOption.textContent = 'Növbəti baxım vaxtı deyil';
+                    emptyOption.disabled = true;
+                    emptyOption.selected = true;
+                    select.appendChild(emptyOption);
+                }
             })
             .catch(error => console.error('Xəta:', error));
     }
@@ -360,12 +379,10 @@
         const container = document.getElementById('detallarContainer');
         const firstItem = container.querySelector('.detallar-item');
 
-        // Birdən çox detal varsa, hamısını sil
         while (container.children.length > 1) {
             container.removeChild(container.lastChild);
         }
 
-        // İlk detala məlumatları yaz
         const firstInputs = firstItem.querySelectorAll('input');
         const firstSelect = firstItem.querySelector('select');
 
@@ -374,7 +391,6 @@
         }
 
         if (details.length > 0) {
-            // İlk detalı doldur
             const firstDetail = details[0];
             firstInputs.forEach(input => {
                 if (input.name.includes('[kodu]')) {
@@ -387,14 +403,15 @@
                     input.value = firstDetail.adi || '';
                 }
                 if (input.name.includes('[depo_miqdari]')) {
-                    input.value = firstDetail.miqdar || 0;
+                    input.value = '';
                 }
                 if (input.name.includes('[islenen_miqdar]')) {
-                    input.value = firstDetail.miqdar || 0;
+                    const miqdar = parseFloat(firstDetail.miqdar) || 0;
+                    const say = parseInt(firstDetail.say) || 0;
+                    input.value = miqdar * say;
                 }
             });
 
-            // Qalan detalları əlavə et
             for (let i = 1; i < details.length; i++) {
                 addDetal();
                 const items = container.querySelectorAll('.detallar-item');
@@ -412,28 +429,65 @@
                         input.value = details[i].adi || '';
                     }
                     if (input.name.includes('[depo_miqdari]')) {
-                        input.value = details[i].miqdar || 0;
+                        input.value = '';
                     }
                     if (input.name.includes('[islenen_miqdar]')) {
-                        input.value = details[i].miqdar || 0;
+                        const miqdar = parseFloat(details[i].miqdar) || 0;
+                        const say = parseInt(details[i].say) || 0;
+                        input.value = miqdar * say;
                     }
                 });
             }
         }
     }
 
-    // Baxım növü seçildikdə detalları avtomatik doldur
-    document.addEventListener('change', function(e) {
-        if (e.target && e.target.id === 'service_template_id') {
-            const select = e.target;
-            const selectedOption = select.options[select.selectedIndex];
+    function onServiceSelectChange() {
+        const select = document.getElementById('service_template_id');
+        const selectedOption = select.options[select.selectedIndex];
 
-            if (selectedOption && selectedOption.dataset.details) {
-                const details = JSON.parse(selectedOption.dataset.details);
-                fillDetallarFromTemplate(details);
+        if (!selectedOption || !selectedOption.value) return;
+
+        const templateId = selectedOption.value;
+        const templateName = selectedOption.textContent;
+        const details = JSON.parse(selectedOption.dataset.details || '[]');
+
+        const hiddenInput = document.getElementById('service_template_id_hidden');
+        if (hiddenInput) {
+            hiddenInput.value = templateId;
+        }
+
+        const shikayetSelects = document.querySelectorAll('select[name="shikayet[]"]');
+        if (shikayetSelects.length > 0) {
+            const firstShikayetSelect = shikayetSelects[0];
+            let found = false;
+            for (let i = 0; i < firstShikayetSelect.options.length; i++) {
+                if (firstShikayetSelect.options[i].textContent.trim() === templateName.trim()) {
+                    firstShikayetSelect.value = firstShikayetSelect.options[i].value;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                const newOption = document.createElement('option');
+                newOption.value = templateName;
+                newOption.textContent = templateName;
+                newOption.selected = true;
+                firstShikayetSelect.appendChild(newOption);
             }
         }
-    });
+
+        if (details.length > 0) {
+            const formattedDetails = details.map(d => ({
+                kodu: d.kodu,
+                adi: d.adi,
+                depo_miqdari: d.miqdar,
+                islenen_miqdar: parseFloat(d.miqdar) * parseInt(d.say || 1),
+                shikayet_index: 0,
+                qeyd: `${d.adi} - ${d.say || 1} dəfə`
+            }));
+            fillDetallarFromTemplate(formattedDetails);
+        }
+    }
 
     // ==================== 4. DİNAMİK ŞİKAYƏT ====================
     function addShikayet() {
@@ -444,7 +498,7 @@
         const newItem = document.createElement('div');
         newItem.className = 'shikayet-item input-group mb-2';
         newItem.innerHTML = `
-            <span class="input-group-text" style="min-width: 40px;">${newNumber}.</span>
+            <span class="input-group-text shikayet-number">${newNumber}.</span>
             <select class="form-select" name="shikayet[]" required>
                 <option value="">Şikayət seçin...</option>
                 @foreach($complaintTypes as $type)
@@ -498,9 +552,9 @@
         }
 
         const newItem = document.createElement('div');
-        newItem.className = 'detallar-item border rounded p-3 mb-2';
+        newItem.className = 'detallar-item';
         newItem.innerHTML = `
-            <div class="row">
+            <div class="row g-3">
                 <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Aid Olduğu Şikayət</label>
@@ -519,15 +573,13 @@
                 <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Detal Adı</label>
-                        <input type="text" class="form-control" name="detallar[${detalCount}][adi]" required
-                               readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                        <input type="text" class="form-control input-disabled" name="detallar[${detalCount}][adi]" required readonly disabled>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Depo Miqdarı</label>
-                        <input type="text" class="form-control" name="detallar[${detalCount}][depo_miqdari]" required
-                               readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                        <input type="text" class="form-control input-disabled" name="detallar[${detalCount}][depo_miqdari]" required readonly disabled>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -597,12 +649,6 @@
         });
     }
 
-    document.addEventListener('change', function(e) {
-        if (e.target && e.target.name === 'shikayet[]') {
-            updateDetalOptions();
-        }
-    });
-
     // ==================== 7. DETAL KODUNA GÖRƏ ANBAR - DAN MƏLUMAT ÇƏK ====================
     function getDetalByKod(input, index) {
         const kod = input.value;
@@ -625,9 +671,20 @@
             .catch(error => console.error('Xəta:', error));
     }
 
-    // ==================== 8. SƏHİFƏ YÜKLƏNDİKDƏ ====================
+    // ==================== 8. KM DƏYİŞDİKDƏ SELECT - İ YENİLƏ ====================
     document.addEventListener('DOMContentLoaded', function() {
         toggleFields();
+
+        const kmInput = document.getElementById('km');
+        if (kmInput) {
+            kmInput.addEventListener('change', function() {
+                const selectedTip = document.querySelector('input[name="sikayet_tipi"]:checked');
+                const busId = document.getElementById('bus_id').value;
+                if (selectedTip && selectedTip.value === 'texniki_xidmet' && busId) {
+                    loadServiceTemplates(busId);
+                }
+            });
+        }
     });
 </script>
 @endsection
