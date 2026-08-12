@@ -648,3 +648,8 @@ body {
 .pagination-wrapper .pagination {
     margin-bottom: 0;
 }
+
+.badge-status.gözləmədə {
+    background: #6c757d;
+    color: #fff;
+}

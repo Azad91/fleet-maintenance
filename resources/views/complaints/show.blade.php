@@ -131,67 +131,71 @@
             </div>
         </div>
 
-        <!-- Detallar -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h6 class="fw-bold text-success mb-3"><i class="bi bi-tools me-2"></i>🔧 İstifadə Olunan Detallar</h6>
+    <!-- Detallar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h6 class="fw-bold text-success mb-3"><i class="bi bi-tools me-2"></i>🔧 İstifadə Olunan Detallar</h6>
 
-                @php
-                    $detallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
-                    $shikayetler = explode("\n", $complaint->shikayet ?? '');
-                    $shikayetler = array_filter($shikayetler);
-                @endphp
+            @php
+                $detallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
+                $shikayetler = explode("\n", $complaint->shikayet ?? '');
+                $shikayetler = array_filter($shikayetler);
+            @endphp
 
-                @if($detallar && count($detallar) > 0)
-                    @foreach($detallar as $detal)
-                        @php
-                            $shikayetIndex = $detal['shikayet_index'] ?? 0;
-                            $shikayetText = isset($shikayetler[$shikayetIndex]) ? trim($shikayetler[$shikayetIndex]) : "Şikayət " . ($shikayetIndex + 1);
-                        @endphp
-                        <div class="detail-card border rounded p-3 mb-2">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <small class="text-muted d-block">📌 Aid Olduğu Şikayət</small>
-                                    <span class="badge bg-primary">{{ $shikayetText }}</span>
-                                </div>
-                                <div class="col-md-2">
-                                    <small class="text-muted d-block">Detal Kodu</small>
-                                    <strong>{{ $detal['kodu'] ?? '-' }}</strong>
-                                </div>
-                                <div class="col-md-2">
-                                    <small class="text-muted d-block">Detal Adı</small>
-                                    <strong>{{ $detal['adi'] ?? '-' }}</strong>
-                                </div>
-                                <div class="col-md-2">
-                                    <small class="text-muted d-block">Depo Miqdarı</small>
-                                    <strong>{{ $detal['depo_miqdari'] ?? '-' }}</strong>
-                                </div>
-                                <div class="col-md-3">
-                                    <small class="text-muted d-block">İşlənən Miqdar</small>
-                                    <strong class="text-danger">{{ $detal['islenen_miqdar'] ?? '-' }}</strong>
+            @if($detallar && count($detallar) > 0)
+                @foreach($detallar as $detal)
+                    @php
+                        $shikayetIndex = $detal['shikayet_index'] ?? 0;
+                        $shikayetText = isset($shikayetler[$shikayetIndex]) ? trim($shikayetler[$shikayetIndex]) : "Şikayət " . ($shikayetIndex + 1);
+                    @endphp
+                    <div class="detail-card border rounded p-3 mb-2">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <small class="text-muted d-block">📌 Aid Olduğu Şikayət</small>
+                                <span class="badge bg-primary">{{ $shikayetText }}</span>
+                            </div>
+                            <div class="col-md-2">
+                                <small class="text-muted d-block">Detal Kodu</small>
+                                <strong>{{ $detal['kodu'] ?? '-' }}</strong>
+                            </div>
+                            <div class="col-md-2">
+                                <small class="text-muted d-block">Detal Adı</small>
+                                <strong>{{ $detal['adi'] ?? '-' }}</strong>
+                            </div>
+                            <div class="col-md-2">
+                                <small class="text-muted d-block">Depo Miqdarı</small>
+                                <strong>{{ $detal['depo_miqdari'] ?? '-' }}</strong>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted d-block">İşlənən Miqdar</small>
+                                <strong class="text-danger">{{ $detal['islenen_miqdar'] ?? '-' }}</strong>
+                            </div>
+                        </div>
+                        @if(!empty($detal['qeyd']))
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <div class="p-2 bg-light rounded">
+                                    <small class="text-muted d-block">📝 Görülən İşlər</small>
+                                    <strong>{{ $detal['qeyd'] }}</strong>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                @else
-                    <div class="p-3 bg-light rounded">
-                        <p class="mb-0 text-muted">Detal istifadə olunmayıb</p>
+                        @endif
                     </div>
-                @endif
-            </div>
+                @endforeach
+            @else
+                <div class="p-3 bg-light rounded">
+                    <p class="mb-0 text-muted">Detal istifadə olunmayıb</p>
+                </div>
+            @endif
         </div>
+    </div>
 
         <!-- Qeyd və İşçi -->
         <div class="row mb-4">
             <div class="col-12">
                 <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-pencil me-2"></i>📝 Qeyd və İşçi</h6>
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="p-2 bg-light rounded">
-                            <small class="text-muted d-block">Qeyd</small>
-                            <strong>{{ $complaint->qeyd ?? 'Qeyd daxil edilməyib' }}</strong>
-                        </div>
-                    </div>
                     <div class="col-md-6">
                         <div class="p-2 bg-light rounded">
                             <small class="text-muted d-block">👤 Kim iş görüb</small>

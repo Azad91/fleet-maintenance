@@ -80,6 +80,7 @@ class ComplaintController extends Controller
                         'adi' => $warehouse ? $warehouse->ad : null,
                         'depo_miqdari' => $warehouse ? $warehouse->miqdar : null,
                         'islenen_miqdar' => $detal['islenen_miqdar'] ?? 0,
+                        'qeyd' => $detal['qeyd'] ?? null,
                     ];
 
                     if ($warehouse && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
@@ -100,6 +101,11 @@ class ComplaintController extends Controller
     public function show($id)
     {
         $complaint = Complaint::with('bus')->findOrFail($id);
+
+        if ($complaint->detallar) {
+            $complaint->detallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
+        }
+
         return view('complaints.show', compact('complaint'));
     }
 
@@ -108,64 +114,49 @@ class ComplaintController extends Controller
         $complaint = Complaint::findOrFail($id);
         $buses = Bus::orderBy('xett_no')->get();
         $complaintTypes = ComplaintType::orderBy('name')->get();
-        return view('complaints.edit', compact('complaint', 'buses', 'complaintTypes'));
+
+        $detallar = [];
+        if ($complaint->detallar) {
+            $detallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
+        }
+
+        return view('complaints.edit', compact('complaint', 'buses', 'complaintTypes', 'detallar'));
     }
 
-    public function update(ComplaintUpdateRequest $request, $id)
+    public function update(Request $request, $id)
     {
         $complaint = Complaint::findOrFail($id);
-        $data = $request->validated();
 
-        // Şikayət array - ni string - ə çevir
+        // BÜTÜN SAHƏLƏR
+        $complaint->status = $request->status;
+        $complaint->yer = $request->yer;
+        $complaint->surucu_adi = $request->surucu_adi;
+        $complaint->km = $request->km;
+        $complaint->sikayet_tipi = $request->sikayet_tipi;
+        $complaint->kim_is_gorub = $request->kim_is_gorub;
+        $complaint->bildirilme_tarix = $request->bildirilme_tarix;
+        $complaint->bildirilme_saat = $request->bildirilme_saat;
+        $complaint->is_baslama_tarix = $request->is_baslama_tarix;
+        $complaint->is_baslama_saat = $request->is_baslama_saat;
+        $complaint->is_bitme_tarix = $request->is_bitme_tarix;
+        $complaint->is_bitme_saat = $request->is_bitme_saat;
+
+        // Şikayətlər
         if ($request->has('shikayet') && is_array($request->shikayet)) {
-            $data['shikayet'] = implode("\n", array_filter($request->shikayet));
+            $complaint->shikayet = implode("\n", array_filter($request->shikayet));
         }
 
-        // Köhnə detalları yadda saxla (anbar əməliyyatı üçün)
-        $oldDetallar = is_array($complaint->detallar) ? $complaint->detallar : json_decode($complaint->detallar, true);
-
-        // Köhnə detalları geri qaytar (anbara)
-        if ($oldDetallar) {
-            foreach ($oldDetallar as $detal) {
-                if (!empty($detal['kodu']) && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
-                    $warehouse = Warehouse::where('kod', $detal['kodu'])->first();
-                    if ($warehouse) {
-                        $warehouse->miqdar = $warehouse->miqdar + $detal['islenen_miqdar'];
-                        $warehouse->save();
-                    }
-                }
-            }
-        }
-
-        // Yeni detalları yığ və anbardan çıxar
+        // Detallar
         if ($request->has('detallar') && is_array($request->detallar)) {
-            $detallar = [];
-            foreach ($request->detallar as $detal) {
-                if (!empty($detal['kodu'])) {
-                    $warehouse = Warehouse::where('kod', $detal['kodu'])->first();
-                    $detallar[] = [
-                        'shikayet_index' => $detal['shikayet_index'] ?? 0,
-                        'kodu' => $detal['kodu'],
-                        'adi' => $warehouse ? $warehouse->ad : null,
-                        'depo_miqdari' => $warehouse ? $warehouse->miqdar : null,
-                        'islenen_miqdar' => $detal['islenen_miqdar'] ?? 0,
-                    ];
-
-                    if ($warehouse && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
-                        $warehouse->miqdar = $warehouse->miqdar - $detal['islenen_miqdar'];
-                        $warehouse->save();
-                    }
-                }
-            }
-            $data['detallar'] = json_encode($detallar, JSON_UNESCAPED_UNICODE);
+            $complaint->detallar = json_encode($request->detallar, JSON_UNESCAPED_UNICODE);
         } else {
-            $data['detallar'] = null;
+            $complaint->detallar = null;
         }
 
-        $complaint->update($data);
-        return redirect()->route('complaints.index')->with('success', 'Şikayət uğurla yeniləndi!');
-    }
+        $complaint->save();
 
+        return redirect('/complaints')->with('success', 'Şikayət uğurla yeniləndi!');
+    }
     public function destroy($id)
     {
         $complaint = Complaint::findOrFail($id);

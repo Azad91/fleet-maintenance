@@ -6,10 +6,10 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>📋 Şikayətlər</h1>
     <div>
-        <a href="{{ route('complaint-types.index') }}" class="btn btn-info">
+        <a href="{{ route('complaint-types.index') }}" class="btn btn-info" target="_blank">
             <i class="bi bi-tags"></i> Şikayət Başlıqları
         </a>
-        <a href="{{ route('complaints.create') }}" class="btn btn-success">
+        <a href="{{ route('complaints.create') }}" class="btn btn-success" target="_blank">
             <i class="bi bi-plus-lg"></i> Yeni Şikayət
         </a>
     </div>

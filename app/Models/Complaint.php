@@ -22,9 +22,9 @@ class Complaint extends Model
         'is_bitme_tarix',
         'is_bitme_saat',
         'status',
-        'detallar',
+        'detallar',  // JSON - da qeyd saxlanılır
         'km',
-        'qeyd',
+        // 'qeyd',  // SİLİNDİ
         'kim_is_gorub',
     ];
 
