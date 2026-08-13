@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Yeni Şikayət')
+@section('title', 'Yeni Kart')
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h4>📋 Yeni Şikayət Əlavə Et</h4>
+        <h4>📋 Yeni Kart Əlavə Et</h4>
     </div>
     <div class="card-body">
         @if ($errors->any())

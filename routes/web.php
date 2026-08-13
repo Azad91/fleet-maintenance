@@ -257,3 +257,14 @@ Route::get('get-service-template-by-km/{km}', function ($km) {
     $template = App\Models\ServiceTemplate::where('default_km_interval', $km)->first();
     return response()->json($template);
 })->name('get.service.template.by.km');
+
+Route::prefix('daily-km')->name('daily-km.')->middleware(['role:admin'])->group(function () {
+    Route::get('/import', [DailyKmController::class, 'importForm'])->name('import');
+    Route::post('/import', [DailyKmController::class, 'import'])->name('import.store');
+    Route::get('/create', [DailyKmController::class, 'create'])->name('create');  // <--- BUNU ƏLAVƏ ET
+    Route::post('/', [DailyKmController::class, 'store'])->name('store');         // <--- BUNU ƏLAVƏ ET
+    Route::get('/{daily_km}/edit', [DailyKmController::class, 'edit'])->name('edit');
+    Route::put('/{daily_km}', [DailyKmController::class, 'update'])->name('update');
+    Route::delete('/{daily_km}', [DailyKmController::class, 'destroy'])->name('destroy');
+    Route::get('/', [DailyKmController::class, 'index'])->name('index');          // <--- BUNU ƏLAVƏ ET
+});

@@ -41,7 +41,7 @@ class DailyKmController extends Controller
     public function show($id)
     {
         $dailyKm = DailyKm::with('bus')->findOrFail($id);
-        return view('daily-km.show', compact('dailyKm'));
+        return redirect()->route('buses.show', $dailyKm->bus_id)->with('info', 'Bu KM məlumatı avtobus səhifəsində göstərilir.');
     }
 
     public function edit($id)
@@ -82,6 +82,8 @@ class DailyKmController extends Controller
 
     public function import(Request $request)
     {
+        set_time_limit(600);
+
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv'
         ]);
@@ -90,7 +92,12 @@ class DailyKmController extends Controller
             Excel::import(new DailyKmImport, $request->file('file'));
             return redirect()->route('daily-km.index')->with('success', 'Gündəlik KM məlumatları uğurla idxal edildi!');
         } catch (\Exception $e) {
-            return redirect()->route('daily-km.index')->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            // XƏTANİ GÖSTƏR
+            return redirect()->route('daily-km.index')->with('error',
+                'Xəta: ' . $e->getMessage() .
+                ' | Fayl: ' . $e->getFile() .
+                ' | Sətir: ' . $e->getLine()
+            );
         }
     }
 }

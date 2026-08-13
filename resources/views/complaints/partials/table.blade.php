@@ -61,7 +61,7 @@
                             @if(isset($dqn) || isset($xett_no) || isset($yer) || isset($shikayet))
                                 Axtarış nəticəsində heç nə tapılmadı
                             @else
-                                Hələ şikayət yoxdur. <a href="{{ route('complaints.create') }}">Yenisini əlavə et!</a>
+                                Hələ kart yoxdur. <a href="{{ route('complaints.create') }}">Yenisini əlavə et!</a>
                             @endif
                         </td>
                     </tr>

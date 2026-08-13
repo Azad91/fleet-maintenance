@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Şikayət Redaktə Et')
+@section('title', 'Kart Redaktə Et')
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h4>✏️ Şikayət Redaktə Et</h4>
+        <h4>✏️ Kart Redaktə Et</h4>
     </div>
     <div class="card-body">
         <form action="{{ route('complaints.update', $complaint->id) }}" method="POST">

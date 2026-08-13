@@ -35,7 +35,13 @@ class Bus extends Model
 
     public function dailyKms()
     {
-        return $this->hasMany(DailyKm::class);
+        return $this->hasMany(DailyKm::class)->orderBy('tarix', 'desc');
+    }
+
+    public function getLatestKmAttribute()
+    {
+        $latest = $this->dailyKms()->orderBy('tarix', 'desc')->first();
+        return $latest ? $latest->km : null;
     }
 
     // ==================== SCOPES ====================

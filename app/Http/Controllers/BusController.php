@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BusStoreRequest;
 use App\Http\Requests\BusUpdateRequest;
 use App\Models\Bus;
+use App\Models\DailyKm;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\BusesImport;
@@ -14,7 +15,8 @@ class BusController extends Controller
     public function index()
     {
         $buses = Bus::orderBy('id')->paginate(config('settings.pagination', 15));
-        return view('buses.index', compact('buses'));
+        $dailyKms = DailyKm::with('bus')->orderBy('tarix', 'desc')->get(); // YENİ
+        return view('buses.index', compact('buses', 'dailyKms')); // compact - a əlavə et
     }
 
     public function search(Request $request)

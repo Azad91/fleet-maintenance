@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Şikayətlər')
+@section('title', 'Kartlar')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>📋 Şikayətlər</h1>
+    <h1>📋 Kartlar</h1>
     <div>
         <a href="{{ route('complaint-types.index') }}" class="btn btn-info" target="_blank">
             <i class="bi bi-tags"></i> Şikayət Başlıqları
         </a>
-        <a href="{{ route('complaints.create') }}" class="btn btn-success" target="_blank">
-            <i class="bi bi-plus-lg"></i> Yeni Şikayət
+        <a href="{{ route('complaints.create') }}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Yeni Kart
         </a>
     </div>
 </div>
@@ -43,8 +43,8 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-search"></i> Axtar
                 </button>
-                <a href="{{ route('complaints.index') }}" class="btn btn-secondary">
-                    <i class="bi bi-x-circle"></i> Təmizlə
+                <a href="{{ route('complaints.create') }}" class="btn btn-info">
+                    <i class="bi bi-plus-lg"></i> Yeni Kart
                 </a>
             </div>
         </form>
@@ -53,7 +53,7 @@
 
 <!-- Nəticələr -->
 <div id="searchResults">
-    @include('complaints.partials.table', ['complaints' => $complaints])
+    @include('complaints.partials.cards', ['complaints' => $complaints])
 </div>
 @endsection
 
