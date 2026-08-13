@@ -60,6 +60,13 @@
                         </div>
                     @endif
 
+                    @if($role == 'admin')
+                        <div class="nav-label">İdarəetmə</div>
+                        <a href="{{ route('employees.index') }}" class="{{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                            <i class="bi bi-people"></i> İşçilər
+                        </a>
+                    @endif
+
                     <hr>
                     <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">
                         <i class="bi bi-person"></i> Profil

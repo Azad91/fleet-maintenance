@@ -62,7 +62,7 @@
                         @foreach($shikayetler as $index => $shikayet)
                             <div class="shikayet-item mb-2">
                                 <div class="input-group">
-                                    <span class="input-group-text" style="min-width: 40px;">{{ $index + 1 }}.</span>
+                                    <span class="input-group-text shikayet-number">{{ $index + 1 }}.</span>
                                     <select class="form-select" name="shikayet[]" required>
                                         <option value="">Şikayət seçin...</option>
                                         @foreach($complaintTypes as $type)
@@ -80,7 +80,7 @@
                     @else
                         <div class="shikayet-item mb-2">
                             <div class="input-group">
-                                <span class="input-group-text" style="min-width: 40px;">1.</span>
+                                <span class="input-group-text shikayet-number">1.</span>
                                 <select class="form-select" name="shikayet[]" required>
                                     <option value="">Şikayət seçin...</option>
                                     @foreach($complaintTypes as $type)
@@ -171,6 +171,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Detallar -->
             <div class="card bg-light p-3 mb-3">
                 <h5 class="fw-bold mb-3">🔧 İstifadə Olunan Detallar</h5>
@@ -181,8 +182,8 @@
 
                     @if($detallar && count($detallar) > 0)
                         @foreach($detallar as $index => $detal)
-                            <div class="detallar-item border rounded p-3 mb-2">
-                                <div class="row">
+                            <div class="detallar-item">
+                                <div class="row g-3">
                                     <div class="col-md-2">
                                         <label class="form-label fw-bold">Aid Olduğu Şikayət</label>
                                         <select class="form-select" name="detallar[{{ $index }}][shikayet_index]">
@@ -208,13 +209,13 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label fw-bold">Detal Adı</label>
-                                        <input type="text" class="form-control" name="detallar[{{ $index }}][adi]"
-                                            value="{{ $detal['adi'] ?? '' }}" readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                                        <input type="text" class="form-control input-disabled" name="detallar[{{ $index }}][adi]"
+                                            value="{{ $detal['adi'] ?? '' }}" readonly disabled>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label fw-bold">Depo Miqdarı</label>
-                                        <input type="text" class="form-control" name="detallar[{{ $index }}][depo_miqdari]"
-                                            value="{{ $detal['depo_miqdari'] ?? '' }}" readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                                        <input type="text" class="form-control input-disabled" name="detallar[{{ $index }}][depo_miqdari]"
+                                            value="{{ $detal['depo_miqdari'] ?? '' }}" readonly disabled>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label fw-bold">İşlənən Miqdar</label>
@@ -237,8 +238,8 @@
                             </div>
                         @endforeach
                     @else
-                        <div class="detallar-item border rounded p-3 mb-2">
-                            <div class="row">
+                        <div class="detallar-item">
+                            <div class="row g-3">
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold">Aid Olduğu Şikayət</label>
                                     <select class="form-select" name="detallar[0][shikayet_index]">
@@ -252,13 +253,11 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold">Detal Adı</label>
-                                    <input type="text" class="form-control" name="detallar[0][adi]"
-                                        readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                                    <input type="text" class="form-control input-disabled" name="detallar[0][adi]" readonly disabled>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold">Depo Miqdarı</label>
-                                    <input type="text" class="form-control" name="detallar[0][depo_miqdari]"
-                                        readonly disabled style="background:#e9ecef; cursor:not-allowed;">
+                                    <input type="text" class="form-control input-disabled" name="detallar[0][depo_miqdari]" readonly disabled>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold">İşlənən Miqdar</label>
@@ -287,11 +286,22 @@
                 <small class="text-muted d-block mt-1">Hər detal hansı şikayətə aid olduğunu seçin.</small>
             </div>
 
-            <!-- Kim iş görüb -->
+            <!-- ==================== İŞÇİ (KİM İŞ GÖRÜB) ==================== -->
             <div class="mb-3">
-                <label for="kim_is_gorub" class="form-label fw-bold">👤 Kim iş görüb</label>
-                <input type="text" class="form-control" id="kim_is_gorub" name="kim_is_gorub" value="{{ old('kim_is_gorub', $complaint->kim_is_gorub) }}">
+                <label for="employee_id" class="form-label fw-bold">👤 İşçi <span class="text-danger">*</span></label>
+                <select class="form-select" id="employee_id" name="employee_id" required>
+                    <option value="">İşçi seçin...</option>
+                    @foreach($employees as $employee)
+                        <option value="{{ $employee->id }}" {{ old('employee_id', $complaint->employee_id ?? '') == $employee->id ? 'selected' : '' }}>
+                            {{ $employee->full_name_with_position }}
+                        </option>
+                    @endforeach
+                </select>
+                <small class="text-muted">Bu şikayəti kim icra edir?</small>
             </div>
+
+            <!-- Köhnə "kim_is_gorub" - u gizlədək -->
+            <input type="hidden" name="kim_is_gorub" value="{{ old('kim_is_gorub', $complaint->kim_is_gorub ?? '') }}">
 
             <button type="submit" class="btn btn-success">
                 <i class="bi bi-save"></i> Yenilə
@@ -329,7 +339,7 @@
         newItem.className = 'shikayet-item mb-2';
         newItem.innerHTML = `
             <div class="input-group">
-                <span class="input-group-text" style="min-width: 40px;">${newNumber}.</span>
+                <span class="input-group-text shikayet-number">${newNumber}.</span>
                 <select class="form-select" name="shikayet[]" required>
                     <option value="">Şikayət seçin...</option>
                     @foreach($complaintTypes as $type)
@@ -372,9 +382,9 @@
         }
 
         const newItem = document.createElement('div');
-        newItem.className = 'detallar-item border rounded p-3 mb-2';
+        newItem.className = 'detallar-item';
         newItem.innerHTML = `
-            <div class="row">
+            <div class="row g-3">
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Aid Olduğu Şikayət</label>
                     <select class="form-select" name="detallar[${detalCount}][shikayet_index]">
@@ -387,11 +397,11 @@
                 </div>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Detal Adı</label>
-                    <input type="text" class="form-control" name="detallar[${detalCount}][adi]" readonly disabled style="background:#e9ecef;">
+                    <input type="text" class="form-control input-disabled" name="detallar[${detalCount}][adi]" readonly disabled>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Depo Miqdarı</label>
-                    <input type="text" class="form-control" name="detallar[${detalCount}][depo_miqdari]" readonly disabled style="background:#e9ecef;">
+                    <input type="text" class="form-control input-disabled" name="detallar[${detalCount}][depo_miqdari]" readonly disabled>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">İşlənən Miqdar</label>

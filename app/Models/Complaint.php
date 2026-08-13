@@ -47,4 +47,9 @@ class Complaint extends Model
     {
         return $query->where('yer', $yer);
     }
+    // ==================== RELATIONSHIPS ====================
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
 }

@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Employee;
+use Illuminate\Http\Request;
+use App\Imports\EmployeesImport;
+use Maatwebsite\Excel\Facades\Excel;
+
+class EmployeeController extends Controller
+{
+    public function index()
+    {
+        $employees = Employee::orderBy('ad')->get();
+        return view('employees.index', compact('employees'));
+    }
+
+    public function create()
+    {
+        // BURADA İSTİFADƏ OLUNUR!
+        $positions = config('settings.employee_positions');
+        return view('employees.create', compact('positions'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'ad' => 'required|string|max:255',
+            'soyad' => 'required|string|max:255',
+            'vezifesi' => 'required|string|max:255',
+            'qeyd' => 'nullable|string',
+        ]);
+
+        Employee::create($request->all());
+
+        return redirect()->route('employees.index')->with('success', 'İşçi uğurla əlavə edildi!');
+    }
+
+    public function show($id)
+    {
+        $employee = Employee::findOrFail($id);
+        return view('employees.show', compact('employee'));
+    }
+
+    public function edit($id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        // BURADA İSTİFADƏ OLUNUR!
+        $positions = config('settings.employee_positions');
+        return view('employees.edit', compact('employee', 'positions'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        $request->validate([
+            'ad' => 'required|string|max:255',
+            'soyad' => 'required|string|max:255',
+            'vezifesi' => 'required|string|max:255',
+            'qeyd' => 'nullable|string',
+        ]);
+
+        $employee->update($request->all());
+
+        return redirect()->route('employees.index')->with('success', 'İşçi uğurla yeniləndi!');
+    }
+
+    public function destroy($id)
+    {
+        $employee = Employee::findOrFail($id);
+        $employee->delete();
+
+        return redirect()->route('employees.index')->with('success', 'İşçi uğurla silindi!');
+    }
+
+    public function importForm()
+    {
+        return view('employees.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            Excel::import(new EmployeesImport, $request->file('file'));
+            return redirect()->route('employees.index')->with('success', 'İşçilər uğurla idxal edildi!');
+        } catch (\Exception $e) {
+            return redirect()->route('employees.index')->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+        }
+    }
+}

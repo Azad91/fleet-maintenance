@@ -49,4 +49,19 @@ return [
         'nasazliq' => '⚠️ Nasazlıq',
         'texniki_xidmet' => '🔧 Texniki Xidmət',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Employee Positions (İşçi Vəzifələri)
+    |--------------------------------------------------------------------------
+    */
+    'employee_positions' => [
+        'usta' => '🔧 Usta',
+        'mexanik' => '🔩 Mexanik',
+        'sürücü' => '🚌 Sürücü',
+        'elektrik' => '⚡ Elektrik',
+        'qaynaqci' => '🔥 Qaynaqçı',
+        'boyakar' => '🎨 Boyakar',
+        'digər' => '📌 Digər',
+    ],
 ];

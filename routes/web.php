@@ -8,6 +8,7 @@ use App\Http\Controllers\MotorOilController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EmployeeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -268,3 +269,25 @@ Route::prefix('daily-km')->name('daily-km.')->middleware(['role:admin'])->group(
     Route::delete('/{daily_km}', [DailyKmController::class, 'destroy'])->name('destroy');
     Route::get('/', [DailyKmController::class, 'index'])->name('index');          // <--- BUNU ƏLAVƏ ET
 });
+
+/*
+|--------------------------------------------------------------------------
+| Employee Routes (İşçilər)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('employees')->name('employees.')->middleware(['auth', 'role:admin'])->group(function () {
+
+    // ƏVVƏL İMPORT ROUTE - LARI (STATİK URL)
+    Route::get('/import', [EmployeeController::class, 'importForm'])->name('import');
+    Route::post('/import', [EmployeeController::class, 'import'])->name('import.store');
+
+    // SONRA CRUD ROUTE - LARI (DİNAMİK URL)
+    Route::get('/create', [EmployeeController::class, 'create'])->name('create');
+    Route::post('/', [EmployeeController::class, 'store'])->name('store');
+    Route::get('/', [EmployeeController::class, 'index'])->name('index');
+    Route::get('/{employee}', [EmployeeController::class, 'show'])->name('show');
+    Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
+    Route::put('/{employee}', [EmployeeController::class, 'update'])->name('update');
+    Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
+});
+

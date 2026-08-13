@@ -243,11 +243,22 @@
     <small class="text-muted d-block mt-1">Hər detal hansı şikayətə aid olduğunu seçin.</small>
 </div>
 
-<!-- ==================== 13. KİM İŞ GÖRÜB ==================== -->
+<!-- ==================== 13. İŞÇİ (KİM İŞ GÖRÜB) ==================== -->
 <div class="mb-3">
-    <label for="kim_is_gorub" class="form-label fw-bold">👤 Kim iş görüb <span class="text-danger">*</span></label>
-    <input type="text" class="form-control" id="kim_is_gorub" name="kim_is_gorub" required placeholder="İşçi adı" value="{{ old('kim_is_gorub') }}">
+    <label for="employee_id" class="form-label fw-bold">👤 İşçi <span class="text-danger">*</span></label>
+    <select class="form-select" id="employee_id" name="employee_id" required>
+        <option value="">İşçi seçin...</option>
+        @foreach($employees as $employee)
+            <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+                {{ $employee->full_name_with_position }}
+            </option>
+        @endforeach
+    </select>
+    <small class="text-muted">Bu şikayəti kim icra edir?</small>
 </div>
+
+<!-- Köhnə "kim_is_gorub" - u gizlədək -->
+<input type="hidden" name="kim_is_gorub" value="{{ old('kim_is_gorub') }}">
 
 <!-- ==================== 14. DÜYMƏLƏR ==================== -->
 <div class="d-flex gap-2">
