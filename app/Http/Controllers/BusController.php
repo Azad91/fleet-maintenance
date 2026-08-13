@@ -15,8 +15,7 @@ class BusController extends Controller
     public function index()
     {
         $buses = Bus::orderBy('id')->paginate(config('settings.pagination', 15));
-        $dailyKms = DailyKm::with('bus')->orderBy('tarix', 'desc')->get(); // YENİ
-        return view('buses.index', compact('buses', 'dailyKms')); // compact - a əlavə et
+        return view('buses.index', compact('buses'));
     }
 
     public function search(Request $request)
@@ -27,8 +26,7 @@ class BusController extends Controller
 
         $buses = Bus::when($search, function ($query, $search) {
             return $query->where('dqn', 'ILIKE', "%{$search}%")
-                        ->orWhere('xett_no', 'ILIKE', "%{$search}%")
-                        ->orWhere('km', 'ILIKE', "%{$search}%");
+                        ->orWhere('xett_no', 'ILIKE', "%{$search}%");
         })
         ->orderBy($sort, $order)
         ->paginate(config('settings.pagination', 15));

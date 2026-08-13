@@ -15,40 +15,49 @@ class DailyKmImport implements ToCollection, WithHeadingRow, WithChunkReading, W
 {
     public function collection(Collection $rows)
     {
+        // 01.01.2026 - dan bugünə qədər BÜTÜN GÜNLƏR
+        $startDate = Carbon::createFromDate(2026, 1, 1);
+        $endDate = Carbon::now();
+
+        $dates = [];
+        $currentDate = $startDate->copy();
+
+        while ($currentDate <= $endDate) {
+            $dates[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
+        }
+
+        // KM indeksləri (hər gün üçün bir KM sütunu)
+        // Əgər Excel - də 100 gün varsa, 100 KM sütunu olacaq
+        // İndekslər: 6, 10, 14, 18, 22, ... (hər 4 sütundan bir)
+        $kmIndices = [];
+        for ($i = 0; $i < count($dates); $i++) {
+            $kmIndices[] = 6 + ($i * 4); // 6, 10, 14, 18, 22, ...
+        }
+
         foreach ($rows as $row) {
-            // PLAKA NO - ni indeks 3 - dən götür
+            // PLAKA NO - nu indeks 3 - dən götür
             $plaka = $row[3] ?? null;
             if (!$plaka) {
                 continue;
             }
 
-            // Avtobusu tap
             $bus = Bus::where('dqn', $plaka)->first();
             if (!$bus) {
-                \Log::info('Bus tapılmadı: ' . $plaka);
                 continue;
             }
 
-            // Tarixləri və KM - ləri oxu
-            // Excel - də hər gün üçün: GÜZERGAH (indeks), YAKIT MİKTARI (indeks+1), KM (indeks+2), YAPILAN KM (indeks+3)
-            // Tarixlər başlıq sətirində: 06.12.2021, 07.12.2021, 08.12.2021
-            // Bunlar $row - da açar kimi gəlir, amma biz onları indekslə oxuyaq
-
-            // 3 gün var: 06.12.2021, 07.12.2021, 08.12.2021
-            $dates = ['06.12.2021', '07.12.2021', '08.12.2021'];
-            $kmIndices = [6, 10, 14]; // KM sütunlarının indeksləri
-
-            foreach ($dates as $index => $dateStr) {
-                try {
-                    $tarix = Carbon::createFromFormat('d.m.Y', $dateStr)->format('Y-m-d');
-                } catch (\Exception $e) {
+            // Hər gün üçün KM dəyərini oxu
+            foreach ($kmIndices as $index => $kmIndex) {
+                // Əgər sütun mövcuddursa
+                if (!isset($row[$kmIndex])) {
                     continue;
                 }
 
-                $kmIndex = $kmIndices[$index];
                 $km = (int) ($row[$kmIndex] ?? 0);
+                $tarix = $dates[$index] ?? null;
 
-                if ($km > 0) {
+                if ($km > 0 && $tarix) {
                     DailyKm::updateOrCreate(
                         [
                             'bus_id' => $bus->id,
