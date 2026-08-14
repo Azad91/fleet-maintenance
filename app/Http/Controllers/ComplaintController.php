@@ -54,20 +54,20 @@ class ComplaintController extends Controller
         return view('complaints.partials.table', compact('complaints', 'dqn', 'xett_no', 'yer', 'shikayet'));
     }
 
-    public function create()
-    {
-        $buses = Bus::orderBy('xett_no')->get();
-        $complaintTypes = ComplaintType::orderBy('name')->get();
-        $serviceTemplates = ServiceTemplate::orderBy('default_km_interval', 'asc')->get();
-        $employees = Employee::active()->orderBy('ad')->get(); // YENİ - aktiv işçilər
+public function create()
+{
+    $buses = Bus::orderBy('xett_no')->get();
+    $complaintTypes = ComplaintType::orderBy('name')->get();
+    $serviceTemplates = ServiceTemplate::orderBy('default_km_interval', 'asc')->get();
+    $employees = Employee::active()->orderBy('ad')->get();
 
-        return view('complaints.create', compact(
-            'buses',
-            'complaintTypes',
-            'serviceTemplates',
-            'employees' // YENİ
-        ));
-    }
+    return view('complaints.create', compact(
+        'buses',
+        'complaintTypes',
+        'serviceTemplates',
+        'employees'
+    ));
+}
 
 public function store(ComplaintStoreRequest $request)
 {
@@ -157,6 +157,9 @@ public function update(Request $request, $id)
 {
     $complaint = Complaint::findOrFail($id);
 
+    // Köhnə detalları al
+    $oldDetallar = $complaint->detallar ?? [];
+
     // BÜTÜN SAHƏLƏR
     $complaint->status = $request->status;
     $complaint->yer = $request->yer;
@@ -171,24 +174,52 @@ public function update(Request $request, $id)
     $complaint->is_bitme_tarix = $request->is_bitme_tarix;
     $complaint->is_bitme_saat = $request->is_bitme_saat;
 
-    // employee_id - ni yenilə
     if ($request->has('employee_id')) {
         $complaint->employee_id = $request->employee_id;
     }
 
-    // Şikayətlər
     if ($request->has('shikayet') && is_array($request->shikayet)) {
         $complaint->shikayet = implode("\n", array_filter($request->shikayet));
     }
 
-    // Detallar
+    // Köhnə detalları anbara geri qaytar
+    foreach ($oldDetallar as $old) {
+        if (!empty($old['kodu']) && !empty($old['islenen_miqdar'])) {
+            $warehouse = Warehouse::where('kod', $old['kodu'])->first();
+            if ($warehouse) {
+                $warehouse->miqdar = $warehouse->miqdar + $old['islenen_miqdar'];
+                $warehouse->save();
+            }
+        }
+    }
+
+    // Yeni detalları saxla
     if ($request->has('detallar') && is_array($request->detallar)) {
-        $complaint->detallar = json_encode($request->detallar, JSON_UNESCAPED_UNICODE);
+        $detallar = [];
+        foreach ($request->detallar as $detal) {
+            if (!empty($detal['kodu'])) {
+                $warehouse = Warehouse::where('kod', $detal['kodu'])->first();
+                $detallar[] = [
+                    'shikayet_index' => $detal['shikayet_index'] ?? 0,
+                    'kodu' => $detal['kodu'],
+                    'adi' => $warehouse ? $warehouse->ad : null,
+                    'depo_miqdari' => $warehouse ? $warehouse->miqdar : null,
+                    'islenen_miqdar' => $detal['islenen_miqdar'] ?? 0,
+                    'qeyd' => $detal['qeyd'] ?? null,
+                ];
+
+                // Anbardan çıxar
+                if ($warehouse && !empty($detal['islenen_miqdar']) && $detal['islenen_miqdar'] > 0) {
+                    $warehouse->miqdar = $warehouse->miqdar - $detal['islenen_miqdar'];
+                    $warehouse->save();
+                }
+            }
+        }
+        $complaint->detallar = json_encode($detallar, JSON_UNESCAPED_UNICODE);
     } else {
         $complaint->detallar = null;
     }
 
-    // Texniki xidmət məlumatlarını yenilə
     if ($request->has('service_template_id')) {
         $complaint->service_template_id = $request->service_template_id;
     }

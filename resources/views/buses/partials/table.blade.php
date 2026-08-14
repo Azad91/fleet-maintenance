@@ -1,44 +1,77 @@
 <div class="card">
     <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">🚌 Avtobuslar</h5>
+            <span class="badge bg-primary rounded-pill">
+                Cəmi: {{ $buses->count() }} ədəd
+            </span>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 50px; text-align: center;">№</th>
+                        <th>BUS PROJECT</th>
+                        <th>VIN</th>
+                        <th>UZUNLUQ</th>
                         <th>Xətt №</th>
                         <th>DQN</th>
-                        <th>KM (Yürüş)</th>
-                        <th>Tarix</th>
-                        <th>Status</th>
-                        <th>Əməliyyatlar</th>
+                        <th>MOTOR №</th>
+                        <th style="width: 150px; text-align: center;">Əməliyyatlar</th>
+                    </tr>
+                    <tr id="busTableFilter" style="background-color: #f8f9fa;">
+                        <th></th>
+                        <th>
+                            <input type="text" class="form-control form-control-sm" name="bus_project"
+                                   placeholder="🔍 Layihə..." style="font-size: 13px;">
+                        </th>
+                        <th>
+                            <input type="text" class="form-control form-control-sm" name="vin"
+                                   placeholder="🔍 Şassi..." style="font-size: 13px;">
+                        </th>
+                        <th>
+                            <input type="text" class="form-control form-control-sm" name="uzunluq"
+                                   placeholder="🔍 Uzunluq..." style="font-size: 13px;">
+                        </th>
+                        <th>
+                            <input type="text" class="form-control form-control-sm" name="xett_no"
+                                   placeholder="🔍 Xətt..." style="font-size: 13px;">
+                        </th>
+                        <th>
+                            <input type="text" class="form-control form-control-sm" name="dqn"
+                                   placeholder="🔍 DQN..." style="font-size: 13px;">
+                        </th>
+                        <th>
+                            <input type="text" class="form-control form-control-sm" name="motor_no"
+                                   placeholder="🔍 Motor..." style="font-size: 13px;">
+                        </th>
+                        <th style="text-align: center;"></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="busTableBody">
                     @forelse($buses as $bus)
                     <tr>
-                        <td>{{ $bus->id }}</td>
+                        <td style="text-align: center;">{{ $loop->iteration }}</td>
+                        <td>{{ $bus->bus_project ?? '-' }}</td>
+                        <td>{{ $bus->vin ?? '-' }}</td>
+                        <td>{{ $bus->uzunluq ? number_format($bus->uzunluq, 1) . ' m' : '-' }}</td>
                         <td>{{ $bus->xett_no ?? '-' }}</td>
                         <td><strong>{{ $bus->dqn }}</strong></td>
-                        <td>{{ $bus->km ? number_format($bus->km, 0, ',', '.') . ' km' : '-' }}</td>
-                        <td>{{ $bus->tarix ? \Carbon\Carbon::parse($bus->tarix)->format('d.m.Y') : '-' }}</td>
-                        <td>
-                            <span class="badge-status {{ $bus->aktiv ? 'aktiv' : 'passiv' }}">
-                                {{ $bus->aktiv ? '✅ Aktiv' : '❌ Passiv' }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <a href="{{ route('buses.show', $bus) }}" class="btn btn-sm btn-primary">
+                        <td>{{ $bus->motor_no ?? '-' }}</td>
+                        <td style="text-align: center;">
+                            <div class="d-flex justify-content-center gap-1">
+                                <a href="{{ route('buses.show', $bus) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 @if(Auth::user()->role == 'admin')
-                                    <a href="{{ route('buses.edit', $bus) }}" class="btn btn-sm btn-warning">
+                                    <a href="{{ route('buses.edit', $bus) }}" class="btn btn-sm btn-outline-warning">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('buses.destroy', $bus) }}" method="POST" style="display:inline">
+                                    <form action="{{ route('buses.destroy', $bus) }}" method="POST" style="display:inline" onsubmit="return confirm('Əminsən?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsən?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
@@ -48,12 +81,12 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
+                        <td colspan="8" class="text-center text-muted py-4">
                             <i class="bi bi-bus-front" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
-                            @if(isset($search) && $search)
-                                "<strong>{{ $search }}</strong>" üzrə heç nə tapılmadı
+                            @if(isset($isEmpty) && $isEmpty)
+                                <p class="mb-0">Axtarış nəticəsində heç nə tapılmadı.</p>
                             @else
-                                Hələ avtobus yoxdur. <a href="{{ route('buses.import') }}">Excel - dən yüklə!</a>
+                                <p class="mb-0">Hələ avtobus yoxdur. <a href="{{ route('buses.import') }}">Excel - dən yüklə!</a></p>
                             @endif
                         </td>
                     </tr>
@@ -61,12 +94,5 @@
                 </tbody>
             </table>
         </div>
-
-        <!-- PAGINATION -->
-        @if($buses->hasPages())
-            <div class="pagination-wrapper">
-                {{ $buses->appends(request()->query())->links() }}
-            </div>
-        @endif
     </div>
 </div>

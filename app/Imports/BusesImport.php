@@ -5,45 +5,37 @@ namespace App\Imports;
 use App\Models\Bus;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\SkipsOnFailure;
-use Maatwebsite\Excel\Concerns\SkipsFailures;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class BusesImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsEmptyRows
+class BusesImport implements ToModel, WithHeadingRow
 {
-    use SkipsFailures;
-
     public function model(array $row)
     {
-        // dqn boşdursa, keç
-        if (empty($row['dqn'])) {
+        // Sənin Excel çıxışına əsasən dəqiq sahələr:
+        $dqn      = trim($row['dqn'] ?? '');
+        $project  = $row['bus_project'] ?? null;
+        $vin      = $row['vin'] ?? null;
+        $uzunluq  = $row['uzunluq'] ?? null;
+        $xett_no  = $row['xett'] ?? null;    // BURADA "xett_no" YOX, "xett"!
+        $motor_no = $row['motor'] ?? null;   // BURADA "motor_no" YOX, "motor"!
+
+        if (empty($dqn)) {
             return null;
         }
 
+        // Uzunluq rəqəmə çevir (əgər metr varsa)
+        $uzunluq = $uzunluq ? (float) preg_replace('/[^0-9.]/', '', $uzunluq) : null;
+
         return Bus::updateOrCreate(
-            ['dqn' => $row['dqn']],
+            ['dqn' => $dqn],
             [
-                'xett_no' => $row['xett_no'] ?? null,
-                'km' => $row['km'] ?? null,
-                'tarix' => now()->format('Y-m-d'),
+                'bus_project' => $project,
+                'vin'         => $vin,
+                'uzunluq'     => $uzunluq,
+                'xett_no'     => $xett_no,
+                'motor_no'    => $motor_no,
+                'tarix'       => now()->format('Y-m-d'),
+                'aktiv'       => true,
             ]
         );
-    }
-
-    public function rules(): array
-    {
-        return [
-            'dqn' => 'required',
-            'xett_no' => 'nullable',
-            'km' => 'nullable|integer|min:0',
-        ];
-    }
-
-    public function customValidationMessages(): array
-    {
-        return [
-            'dqn.required' => 'DQN boş buraxıla bilməz!',
-        ];
     }
 }

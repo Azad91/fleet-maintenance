@@ -10,14 +10,15 @@ class Bus extends Model
     use HasFactory;
 
     protected $fillable = [
-    'xett_no',
-    'dqn',
-    'shikayet',
-    'tarix',           // SADƏC TARİX QALDI
-    'surucu_adi',
-    'detallar',
-    'aktiv',
-    'km',
+        'bus_project',
+        'vin',
+        'uzunluq',
+        'xett_no',
+        'dqn',
+        'motor_no',
+        'km',
+        'tarix',
+        'aktiv',
     ];
 
     protected $casts = [
@@ -53,5 +54,16 @@ class Bus extends Model
     public function scopeInactive($query)
     {
         return $query->where('aktiv', false);
+    }
+
+    public function dailyStatuses()
+    {
+        return $this->hasMany(BusDailyStatus::class)->orderBy('tarix', 'desc');
+    }
+
+    // Ən son statusu asanlıqla almaq üçün aksessor:
+    public function getLatestStatusAttribute()
+    {
+        return $this->dailyStatuses()->first();
     }
 }

@@ -9,10 +9,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\BusDailyStatusController;
+use App\Http\Controllers\DailyKmRecordController;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes (Hər kəs üçün açıq)
+| Public Routes
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
@@ -21,67 +23,43 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Auth Routes (Breeze ilə gələn)
+| Auth Routes (Breeze)
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes (Giriş etmiş istifadəçilər üçün)
+| Authenticated Routes
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard
-    |--------------------------------------------------------------------------
-    */
+    // Dashboard
     Route::get('/dashboard', function () {
         $totalBuses = App\Models\Bus::count();
         $totalComplaints = App\Models\Complaint::count();
         $totalWarehouses = App\Models\Warehouse::count();
 
-        $recentComplaints = App\Models\Complaint::with('bus')
-            ->orderBy('id', 'desc')
-            ->limit(5)
-            ->get();
-
-        $recentWarehouses = App\Models\Warehouse::orderBy('id', 'desc')->limit(5)->get();
-
+        $recentComplaints = App\Models\Complaint::with('bus')->orderBy('id', 'desc')->limit(5)->get();
         $recentBuses = App\Models\Bus::orderBy('id', 'desc')->limit(5)->get();
-
         $lowStockItems = App\Models\Warehouse::whereColumn('miqdar', '<=', 'minimum_miqdar')->get();
 
         return view('dashboard', compact(
-            'totalBuses',
-            'totalComplaints',
-            'totalWarehouses',
-            'recentComplaints',
-            'recentWarehouses',
-            'recentBuses',
-            'lowStockItems'
+            'totalBuses', 'totalComplaints', 'totalWarehouses',
+            'recentComplaints', 'recentBuses', 'lowStockItems'
         ));
     })->name('dashboard');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Profile Routes
-    |--------------------------------------------------------------------------
-    */
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Bus Routes (Avtobuslar)
-    |--------------------------------------------------------------------------
-    */
+    // ==================== BUS ROUTES ====================
     Route::prefix('buses')->name('buses.')->group(function () {
 
-        // YALNIZ ADMIN üçün CRUD + Import (ƏVVƏL)
+        // Qrup 1: Yalnız Admin üçün CRUD və Import
         Route::middleware(['role:admin'])->group(function () {
             Route::get('/import', [BusController::class, 'importForm'])->name('import');
             Route::post('/import', [BusController::class, 'import'])->name('import.store');
@@ -92,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{bus}', [BusController::class, 'destroy'])->name('destroy');
         });
 
-        // ADMIN, BUS, DIRECTORATE üçün baxış (SONRA)
+        // Qrup 2: Admin, Bus, Directorate üçün baxış
         Route::middleware(['role:admin,bus,directorate'])->group(function () {
             Route::get('/', [BusController::class, 'index'])->name('index');
             Route::get('/search', [BusController::class, 'search'])->name('search');
@@ -100,14 +78,8 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Complaint Routes (Şikayətlər)
-    |--------------------------------------------------------------------------
-    */
+    // ==================== COMPLAINT ROUTES ====================
     Route::prefix('complaints')->name('complaints.')->group(function () {
-
-        // ADMIN və COMPLAINT üçün tam CRUD (ƏVVƏL)
         Route::middleware(['role:admin,complaint'])->group(function () {
             Route::get('/import', [ComplaintController::class, 'importForm'])->name('import');
             Route::post('/import', [ComplaintController::class, 'import'])->name('import.store');
@@ -117,7 +89,6 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{complaint}', [ComplaintController::class, 'destroy'])->name('destroy');
         });
 
-        // ADMIN, COMPLAINT, DIRECTORATE üçün baxış (SONRA)
         Route::middleware(['role:admin,complaint,directorate'])->group(function () {
             Route::get('/', [ComplaintController::class, 'index'])->name('index');
             Route::get('/search', [ComplaintController::class, 'search'])->name('search');
@@ -126,25 +97,15 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Complaint Types Routes (Şikayət Növləri)
-    |--------------------------------------------------------------------------
-    */
+    // ==================== COMPLAINT TYPES ====================
     Route::prefix('complaint-types')->name('complaint-types.')->middleware(['role:admin'])->group(function () {
         Route::get('/import', [ComplaintTypeController::class, 'importForm'])->name('import');
         Route::post('/import', [ComplaintTypeController::class, 'import'])->name('import.store');
         Route::resource('/', ComplaintTypeController::class)->parameters(['' => 'complaint_type']);
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Warehouse Routes (Anbar)
-    |--------------------------------------------------------------------------
-    */
+    // ==================== WAREHOUSE ROUTES ====================
     Route::prefix('warehouses')->name('warehouses.')->group(function () {
-
-        // ADMIN və WAREHOUSE üçün tam CRUD (ƏVVƏL)
         Route::middleware(['role:admin,warehouse'])->group(function () {
             Route::get('/import', [WarehouseController::class, 'importForm'])->name('import');
             Route::post('/import', [WarehouseController::class, 'import'])->name('import.store');
@@ -155,7 +116,6 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{warehouse}', [WarehouseController::class, 'destroy'])->name('destroy');
         });
 
-        // ADMIN, WAREHOUSE, DIRECTORATE üçün baxış (SONRA)
         Route::middleware(['role:admin,warehouse,directorate'])->group(function () {
             Route::get('/', [WarehouseController::class, 'index'])->name('index');
             Route::get('/search', [WarehouseController::class, 'search'])->name('search');
@@ -163,40 +123,58 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Daily KM Routes (Gündəlik KM)
-    |--------------------------------------------------------------------------
-    */
+    // ==================== DAILY KM ROUTES ====================
     Route::prefix('daily-km')->name('daily-km.')->middleware(['role:admin'])->group(function () {
         Route::get('/import', [DailyKmController::class, 'importForm'])->name('import');
         Route::post('/import', [DailyKmController::class, 'import'])->name('import.store');
-        Route::resource('/', DailyKmController::class)->parameters(['' => 'daily_km']);
+        Route::get('/create', [DailyKmController::class, 'create'])->name('create');
+        Route::post('/', [DailyKmController::class, 'store'])->name('store');
+        Route::get('/', [DailyKmController::class, 'index'])->name('index');
+        Route::get('/{daily_km}/edit', [DailyKmController::class, 'edit'])->name('edit');
+        Route::put('/{daily_km}', [DailyKmController::class, 'update'])->name('update');
+        Route::delete('/{daily_km}', [DailyKmController::class, 'destroy'])->name('destroy');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Motor Oil Routes
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('motor-oil')->name('motor-oil.')->middleware(['auth', 'role:admin'])->group(function () {
+    // ==================== MOTOR OIL ROUTES ====================
+    Route::prefix('motor-oil')->name('motor-oil.')->middleware(['role:admin'])->group(function () {
         Route::get('/', [MotorOilController::class, 'index'])->name('index');
         Route::get('/search', [MotorOilController::class, 'search'])->name('search');
         Route::get('/import', [MotorOilController::class, 'importForm'])->name('import');
         Route::post('/import', [MotorOilController::class, 'import'])->name('import.store');
     });
+
+    // ==================== EMPLOYEE ROUTES ====================
+    Route::prefix('employees')->name('employees.')->middleware(['role:admin'])->group(function () {
+        Route::get('/import', [EmployeeController::class, 'importForm'])->name('import');
+        Route::post('/import', [EmployeeController::class, 'import'])->name('import.store');
+        Route::get('/create', [EmployeeController::class, 'create'])->name('create');
+        Route::post('/', [EmployeeController::class, 'store'])->name('store');
+        Route::get('/', [EmployeeController::class, 'index'])->name('index');
+        Route::get('/{employee}', [EmployeeController::class, 'show'])->name('show');
+        Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
+        Route::put('/{employee}', [EmployeeController::class, 'update'])->name('update');
+        Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
+    });
+
+    // ==================== BUS DAILY STATUS ROUTES (YENİ) ====================
+    Route::prefix('bus-daily-statuses')->name('bus-daily-statuses.')->middleware(['role:admin'])->group(function () {
+        Route::get('/import', [BusDailyStatusController::class, 'importForm'])->name('import');
+        Route::post('/import', [BusDailyStatusController::class, 'import'])->name('import.store');
+        Route::get('/create', [BusDailyStatusController::class, 'create'])->name('create');
+        Route::post('/', [BusDailyStatusController::class, 'store'])->name('store');
+        Route::get('/', [BusDailyStatusController::class, 'index'])->name('index');
+        Route::get('/{bus_daily_status}', [BusDailyStatusController::class, 'show'])->name('show');
+        Route::get('/{bus_daily_status}/edit', [BusDailyStatusController::class, 'edit'])->name('edit');
+        Route::put('/{bus_daily_status}', [BusDailyStatusController::class, 'update'])->name('update');
+        Route::delete('/{bus_daily_status}', [BusDailyStatusController::class, 'destroy'])->name('destroy');
+    });
 });
 
 /*
 |--------------------------------------------------------------------------
-| API Routes (JSON Cavablar)
+| API Routes (JSON)
 |--------------------------------------------------------------------------
 */
-Route::get('get-dqn-by-xett/{xett_no}', function ($xett_no) {
-    $bus = App\Models\Bus::where('xett_no', $xett_no)->first();
-    return response()->json(['dqn' => $bus ? $bus->dqn : null]);
-})->name('get.dqn.by.xett');
-
 Route::get('get-bus-id-by-xett/{xett_no}', function ($xett_no) {
     $bus = App\Models\Bus::where('xett_no', $xett_no)->first();
     return response()->json([
@@ -210,8 +188,6 @@ Route::get('get-detal-by-kod/{kod}', function ($kod) {
     return response()->json([
         'detal_adi' => $detal ? $detal->ad : null,
         'depo_miqdari' => $detal ? $detal->miqdar : null,
-        'qiymet' => $detal ? $detal->qiymet : null,
-        'olcu_vahidi' => $detal ? $detal->olcu_vahidi : null,
     ]);
 })->name('get.detal.by.kod');
 
@@ -222,17 +198,12 @@ Route::get('get-bus-km-by-id/{bus_id}', function ($bus_id) {
 
 Route::get('get-service-templates/{bus_id}', function ($bus_id) {
     $bus = App\Models\Bus::find($bus_id);
-    if (!$bus) {
-        return response()->json([]);
-    }
+    if (!$bus) return response()->json([]);
 
     $templates = App\Models\ServiceTemplate::all();
-
     $result = $templates->map(function ($template) use ($bus) {
         $interval = App\Models\BusServiceInterval::where('bus_id', $bus->id)
-            ->where('service_template_id', $template->id)
-            ->first();
-
+            ->where('service_template_id', $template->id)->first();
         return [
             'id' => $template->id,
             'name' => $template->name,
@@ -240,54 +211,18 @@ Route::get('get-service-templates/{bus_id}', function ($bus_id) {
             'details' => $template->details,
         ];
     });
-
     return response()->json($result);
 })->name('get.service.templates');
 
-Route::get('get-motor-oil-kms', function () {
-    $kms = App\Models\MotorOilDetail::select('km')->distinct()->orderBy('km')->pluck('km');
-    return response()->json($kms);
-})->name('get.motor.oil.kms');
-
-Route::get('get-motor-oil-details/{km}', function ($km) {
-    $details = App\Models\MotorOilDetail::where('km', $km)->get();
-    return response()->json($details);
-})->name('get.motor.oil.details');
-
-Route::get('get-service-template-by-km/{km}', function ($km) {
-    $template = App\Models\ServiceTemplate::where('default_km_interval', $km)->first();
-    return response()->json($template);
-})->name('get.service.template.by.km');
-
-Route::prefix('daily-km')->name('daily-km.')->middleware(['role:admin'])->group(function () {
-    Route::get('/import', [DailyKmController::class, 'importForm'])->name('import');
-    Route::post('/import', [DailyKmController::class, 'import'])->name('import.store');
-    Route::get('/create', [DailyKmController::class, 'create'])->name('create');  // <--- BUNU ƏLAVƏ ET
-    Route::post('/', [DailyKmController::class, 'store'])->name('store');         // <--- BUNU ƏLAVƏ ET
-    Route::get('/{daily_km}/edit', [DailyKmController::class, 'edit'])->name('edit');
-    Route::put('/{daily_km}', [DailyKmController::class, 'update'])->name('update');
-    Route::delete('/{daily_km}', [DailyKmController::class, 'destroy'])->name('destroy');
-    Route::get('/', [DailyKmController::class, 'index'])->name('index');          // <--- BUNU ƏLAVƏ ET
+// ========== GÜNDƏLİK KM RECORDS (YENİ) ==========
+Route::prefix('daily-km-records')->name('daily-km-records.')->middleware(['role:admin'])->group(function () {
+    Route::get('/import', [DailyKmRecordController::class, 'importForm'])->name('import');
+    Route::post('/import', [DailyKmRecordController::class, 'import'])->name('import.store');
+    Route::get('/create', [DailyKmRecordController::class, 'create'])->name('create');
+    Route::post('/', [DailyKmRecordController::class, 'store'])->name('store');
+    Route::get('/', [DailyKmRecordController::class, 'index'])->name('index');
+    Route::get('/{daily_km_record}', [DailyKmRecordController::class, 'show'])->name('show');
+    Route::get('/{daily_km_record}/edit', [DailyKmRecordController::class, 'edit'])->name('edit');
+    Route::put('/{daily_km_record}', [DailyKmRecordController::class, 'update'])->name('update');
+    Route::delete('/{daily_km_record}', [DailyKmRecordController::class, 'destroy'])->name('destroy');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Employee Routes (İşçilər)
-|--------------------------------------------------------------------------
-*/
-Route::prefix('employees')->name('employees.')->middleware(['auth', 'role:admin'])->group(function () {
-
-    // ƏVVƏL İMPORT ROUTE - LARI (STATİK URL)
-    Route::get('/import', [EmployeeController::class, 'importForm'])->name('import');
-    Route::post('/import', [EmployeeController::class, 'import'])->name('import.store');
-
-    // SONRA CRUD ROUTE - LARI (DİNAMİK URL)
-    Route::get('/create', [EmployeeController::class, 'create'])->name('create');
-    Route::post('/', [EmployeeController::class, 'store'])->name('store');
-    Route::get('/', [EmployeeController::class, 'index'])->name('index');
-    Route::get('/{employee}', [EmployeeController::class, 'show'])->name('show');
-    Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
-    Route::put('/{employee}', [EmployeeController::class, 'update'])->name('update');
-    Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
-});
-

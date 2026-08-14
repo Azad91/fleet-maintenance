@@ -4,41 +4,73 @@
 
 @section('content')
 <div class="container">
-    <h1>🚌 Avtobus Məlumatları</h1>
-
-    <div class="section-title">📋 Əsas Məlumatlar</div>
-
-    <div class="field">
-        <span class="label">ID:</span>
-        <span class="value">{{ $bus->id }}</span>
-    </div>
-    <div class="field">
-        <span class="label">Xətt №:</span>
-        <span class="value">{{ $bus->xett_no ?? '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">DQN:</span>
-        <span class="value"><strong>{{ $bus->dqn }}</strong></span>
-    </div>
-    <div class="field">
-        <span class="label">📊 Cari KM (Yürüş):</span>
-        <span class="value">{{ $bus->km ? number_format($bus->km, 0, ',', '.') . ' km' : '-' }}</span>
-    </div>
-    <div class="field">
-        <span class="label">📅 Son Yenilənmə:</span>
-        <span class="value">{{ $bus->tarix ? \Carbon\Carbon::parse($bus->tarix)->format('d.m.Y') : '-' }}</span>
-    </div>
-
-    <div class="section-title">📊 Status</div>
-    <div class="field">
-        <span class="label">Aktiv:</span>
-        <span class="value {{ $bus->aktiv ? 'active-yes' : 'active-no' }}">
-            {{ $bus->aktiv ? '✅ Aktiv' : '❌ Passiv' }}
-        </span>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🚌 Avtobus Məlumatları</h1>
+        <a href="{{ route('buses.index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Geri
+        </a>
     </div>
 
     <!-- ========================================== -->
-    <!-- 📊 KM TARİXÇƏSİ -->
+    <!-- ƏSAS MƏLUMATLAR (YENİ STRUKTUR)           -->
+    <!-- ========================================== -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">BUS PROJECT</small>
+                        <strong>{{ $bus->bus_project ?? '-' }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">VIN (Şassi №)</small>
+                        <strong>{{ $bus->vin ?? '-' }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">UZUNLUQ</small>
+                        <strong>{{ $bus->uzunluq ? number_format($bus->uzunluq, 1) . ' m' : '-' }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Xətt №</small>
+                        <strong>{{ $bus->xett_no ?? '-' }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">DQN</small>
+                        <strong>{{ $bus->dqn }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">MOTOR №</small>
+                        <strong>{{ $bus->motor_no ?? '-' }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Status</small>
+                        <strong>
+                            @if($bus->aktiv)
+                                <span class="badge bg-success">✅ Aktiv</span>
+                            @else
+                                <span class="badge bg-danger">❌ Passiv</span>
+                            @endif
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 📊 KM TARİXÇƏSİ (Köhnə kodu saxla)         -->
     <!-- ========================================== -->
     <div class="section-title mt-4">
         📊 KM Tarixçəsi

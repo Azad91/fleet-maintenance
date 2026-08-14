@@ -16,9 +16,13 @@ class BusUpdateRequest extends FormRequest
         $busId = $this->route('bus');
 
         return [
-            'xett_no' => 'nullable|string|max:255',
-            'dqn' => 'required|unique:buses,dqn,' . $busId,
-            'km' => 'nullable|integer|min:0',
+            'bus_project' => 'nullable|string|max:255',
+            'vin'         => 'nullable|string|max:17',
+            'uzunluq'     => 'nullable|numeric|min:0',
+            'xett_no'     => 'nullable|string|max:255',
+            'dqn'         => 'required|unique:buses,dqn,' . $busId,
+            'motor_no'    => 'nullable|string|max:255',
+            'aktiv'       => 'nullable|boolean',
         ];
     }
 }

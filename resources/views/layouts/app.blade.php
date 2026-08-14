@@ -35,6 +35,7 @@
                         </a>
                     @endif
 
+
                     @if($role == 'admin' || $role == 'complaint' || $role == 'directorate')
                         <a href="{{ route('complaints.index') }}" class="{{ request()->routeIs('complaints.*') ? 'active' : '' }}">
                             <i class="bi bi-clipboard"></i> Kartlar
@@ -51,6 +52,15 @@
                         <div class="nav-label">Texniki Xidmət</div>
                         <a href="{{ route('motor-oil.index') }}" class="{{ request()->routeIs('motor-oil.*') ? 'active' : '' }}">
                             <i class="bi bi-droplet"></i> Motor Yağ
+                        </a>
+
+                        <a href="{{ route('bus-daily-statuses.index') }}" class="{{ request()->routeIs('bus-daily-statuses.*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar2-check"></i> Gündəlik Status
+                        </a>
+
+                        <!-- YENİ KM QEYDLƏRİ -->
+                        <a href="{{ route('daily-km-records.index') }}" class="{{ request()->routeIs('daily-km-records.*') ? 'active' : '' }}">
+                            <i class="bi bi-speedometer2"></i> Gündəlik KM
                         </a>
                     @endif
 
