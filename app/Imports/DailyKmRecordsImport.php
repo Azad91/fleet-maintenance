@@ -6,16 +6,20 @@ use App\Models\DailyKmRecord;
 use App\Models\Bus;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class DailyKmRecordsImport implements ToModel, WithHeadingRow, WithChunkReading, WithBatchInserts
+class DailyKmRecordsImport implements ToModel, WithHeadingRow
 {
+    public function headingRow(): int
+    {
+        return 1;
+    }
+
     public function model(array $row)
     {
-        $dqn = trim($row[3] ?? '');
+        // DQN (dd nəticəsində 'avtobus_dqn' kimi görünür)
+        $dqn = trim($row['avtobus_dqn'] ?? '');
         if (empty($dqn)) {
             return null;
         }
@@ -25,43 +29,20 @@ class DailyKmRecordsImport implements ToModel, WithHeadingRow, WithChunkReading,
             return null;
         }
 
+        // dd çıxışında rəqəm olan bütün sütunları yoxla
+        // Rəqəmlər: 46204, 46205, 46206 ... 46234
         foreach ($row as $key => $value) {
-            if (empty($value) || (int)$value == 0) {
-                continue;
-            }
+            if (is_numeric($key) && $value > 0) {
+                // Excel rəqəmini tarixə çevir
+                $tarix = Carbon::instance(Date::excelToDateTimeObject((int)$key))->toDateString();
 
-            try {
-                // Tarixi çevir
-                if (is_numeric($key)) {
-                    $tarix = Carbon::instance(Date::excelToDateTimeObject($key));
-                } else {
-                    // Həm dd.mm.yyyy, həm də yyyy-mm-dd formatlarını dəstəklə
-                    $tarix = Carbon::parse($key);
-                }
-
-                $km = (int) $value;
-
-                if ($km > 0) {
-                    DailyKmRecord::updateOrCreate(
-                        ['bus_id' => $bus->id, 'tarix' => $tarix->toDateString()],
-                        ['km' => $km]
-                    );
-                }
-            } catch (\Exception $e) {
-                continue;
+                DailyKmRecord::updateOrCreate(
+                    ['bus_id' => $bus->id, 'tarix' => $tarix],
+                    ['km' => (int) $value]
+                );
             }
         }
 
         return null;
-    }
-
-    public function chunkSize(): int
-    {
-        return 200; // Hər dəfə 200 sətir oxu
-    }
-
-    public function batchSize(): int
-    {
-        return 100; // Hər dəfə 100 sətir yaz
     }
 }

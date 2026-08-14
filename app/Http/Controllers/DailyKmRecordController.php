@@ -10,21 +10,24 @@ use App\Imports\DailyKmRecordsImport;
 
 class DailyKmRecordController extends Controller
 {
-    public function index(Request $request)
-    {
-        $search = $request->search;
-        $query = DailyKmRecord::with('bus');
+public function index(Request $request)
+{
+    $search = $request->search;
+    $query = DailyKmRecord::with('bus');
 
-        if ($search) {
-            $query->whereHas('bus', function($q) use ($search) {
-                $q->where('dqn', 'ILIKE', "%{$search}%")
-                  ->orWhere('xett_no', 'ILIKE', "%{$search}%");
-            })->orWhere('tarix', 'ILIKE', "%{$search}%");
-        }
-
-        $records = $query->orderBy('tarix', 'desc')->get();
-        return view('daily-km-records.index', compact('records', 'search'));
+    if ($search) {
+        $query->whereHas('bus', function($q) use ($search) {
+            $q->where('dqn', 'ILIKE', "%{$search}%")
+              ->orWhere('xett_no', 'ILIKE', "%{$search}%");
+        })->orWhere('tarix', 'ILIKE', "%{$search}%");
     }
+
+    // BURADA GET() ƏVƏZİNƏ PAGINATE() İSTİFADƏ EDİRİK
+    // Hər səhifədə 100 qeyd göstər
+    $records = $query->orderBy('tarix', 'desc')->paginate(100);
+
+    return view('daily-km-records.index', compact('records', 'search'));
+}
 
     public function create()
     {

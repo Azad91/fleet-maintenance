@@ -77,6 +77,13 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- Pagination --}}
+        @if($records->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                {{ $records->links() }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection
