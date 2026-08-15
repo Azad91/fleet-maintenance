@@ -47,11 +47,18 @@ public function index(Request $request)
         return redirect()->route('daily-km-records.index')->with('success', 'KM məlumatı uğurla əlavə edildi!');
     }
 
-    public function show($id)
-    {
-        $record = DailyKmRecord::with('bus')->findOrFail($id);
-        return view('daily-km-records.show', compact('record'));
-    }
+public function show($id)
+{
+    // 1. Cari qeydi tap
+    $record = DailyKmRecord::with('bus')->findOrFail($id);
+
+    // 2. Həmin avtobusa aid BÜTÜN qeydləri götür (tarixə görə sırala)
+    $history = DailyKmRecord::where('bus_id', $record->bus_id)
+                ->orderBy('tarix', 'desc')
+                ->get();
+
+    return view('daily-km-records.show', compact('record', 'history'));
+}
 
     public function edit($id)
     {

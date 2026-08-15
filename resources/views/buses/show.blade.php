@@ -12,7 +12,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- ƏSAS MƏLUMATLAR (YENİ STRUKTUR)           -->
+    <!-- ƏSAS MƏLUMATLAR                            -->
     <!-- ========================================== -->
     <div class="card mb-4">
         <div class="card-body">
@@ -70,16 +70,16 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 📊 KM TARİXÇƏSİ (Köhnə kodu saxla)         -->
+    <!-- 📊 KM TARİXÇƏSİ                             -->
     <!-- ========================================== -->
     <div class="section-title mt-4">
         📊 KM Tarixçəsi
-        <span class="badge bg-primary ms-2">{{ $bus->dailyKms()->count() }} qeyd</span>
+        <span class="badge bg-primary ms-2">{{ $bus->dailyKmRecords()->count() }} qeyd</span>
         <div class="float-end">
-            <a href="{{ route('daily-km.create') }}?bus_id={{ $bus->id }}" class="btn btn-sm btn-success ms-2">
+            <a href="{{ route('daily-km-records.create') }}?bus_id={{ $bus->id }}" class="btn btn-sm btn-success ms-2">
                 <i class="bi bi-plus-lg"></i> KM Əlavə Et
             </a>
-            <a href="{{ route('daily-km.import') }}" class="btn btn-sm btn-info ms-1">
+            <a href="{{ route('daily-km-records.import') }}" class="btn btn-sm btn-info ms-1">
                 <i class="bi bi-upload"></i> Excel - dən Yüklə
             </a>
         </div>
@@ -112,7 +112,7 @@
 
     <!-- Nəticələr -->
     @php
-        $dailyKms = $bus->dailyKms()->orderBy('tarix', 'desc')->get();
+        $dailyKms = $bus->dailyKmRecords()->orderBy('tarix', 'desc')->get();
     @endphp
 
     @if($dailyKms->count() > 0)
@@ -135,13 +135,16 @@
                                 <td>{{ $item->tarix ? $item->tarix->format('d.m.Y') : '-' }}</td>
                                 <td><strong>{{ $item->km ? number_format($item->km, 0, ',', '.') . ' km' : '-' }}</strong></td>
                                 <td>
-                                    <a href="{{ route('daily-km.edit', $item) }}" class="btn btn-sm btn-warning">
+                                    <a href="{{ route('daily-km-records.show', $item) }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ route('daily-km-records.edit', $item) }}" class="btn btn-sm btn-warning">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('daily-km.destroy', $item) }}" method="POST" style="display:inline">
+                                    <form action="{{ route('daily-km-records.destroy', $item) }}" method="POST" style="display:inline" onsubmit="return confirm('Əminsən?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsən?')">
+                                        <button type="submit" class="btn btn-sm btn-danger">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
@@ -162,10 +165,10 @@
                 <i class="bi bi-graph-up" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
                 Hələ bu avtobus üçün KM məlumatı yoxdur.
                 <br>
-                <a href="{{ route('daily-km.create') }}?bus_id={{ $bus->id }}" class="btn btn-success btn-sm mt-2">
+                <a href="{{ route('daily-km-records.create') }}?bus_id={{ $bus->id }}" class="btn btn-success btn-sm mt-2">
                     <i class="bi bi-plus-lg"></i> İlk KM - nı əlavə et
                 </a>
-                <a href="{{ route('daily-km.import') }}" class="btn btn-info btn-sm mt-2">
+                <a href="{{ route('daily-km-records.import') }}" class="btn btn-info btn-sm mt-2">
                     <i class="bi bi-upload"></i> Excel - dən yüklə
                 </a>
             </div>
@@ -249,15 +252,24 @@
         const kmMin = document.getElementById('kmMin').value;
         const kmMax = document.getElementById('kmMax').value;
 
-        const rows = document.querySelectorAll('.km-row');
+        const rows = document.querySelectorAll('#kmTable tbody tr');
 
         rows.forEach(row => {
-            const rowTarix = row.dataset.tarix;
-            const rowKm = parseInt(row.dataset.km);
+            const cells = row.querySelectorAll('td');
+            if (cells.length < 3) return;
+
+            // Cədvəldəki tarix "30.07.2026" formatındadır
+            const rowTarixText = cells[1]?.textContent?.trim() || '';
+            // Inputdan gələn tarix "2026-07-30" formatındadır
+            const inputTarix = tarix ? tarix.split('-').reverse().join('.') : '';
+
+            const rowKmText = cells[2]?.textContent?.trim() || '';
+            const rowKm = parseInt(rowKmText.replace(/[^0-9]/g, '')) || 0;
 
             let show = true;
 
-            if (tarix && rowTarix !== tarix) {
+            // Tarix filtrini düzgün formatda yoxla
+            if (tarix && rowTarixText !== inputTarix) {
                 show = false;
             }
             if (kmMin && rowKm < parseInt(kmMin)) {

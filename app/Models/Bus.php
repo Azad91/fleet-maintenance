@@ -23,7 +23,7 @@ class Bus extends Model
 
     protected $casts = [
         'aktiv' => 'boolean',
-        'tarix' => 'date',       // <--- BU VAR
+        'tarix' => 'date',
         'detallar' => 'array',
         'km' => 'integer',
     ];
@@ -34,15 +34,32 @@ class Bus extends Model
         return $this->hasMany(Complaint::class);
     }
 
-    public function dailyKms()
+    public function dailyKmRecords()
     {
-        return $this->hasMany(DailyKm::class)->orderBy('tarix', 'desc');
+        return $this->hasMany(DailyKmRecord::class)->orderBy('tarix', 'desc');
     }
 
+    public function dailyStatuses()
+    {
+        return $this->hasMany(BusDailyStatus::class)->orderBy('tarix', 'desc');
+    }
+
+    // ==================== ƏN SON MƏLUMATLARI ALMAQ ÜÇÜN ====================
+    public function latestKmRecord()
+    {
+        return $this->hasOne(DailyKmRecord::class)->latest('tarix');
+    }
+
+    // Ən son KM dəyərini almaq üçün aksessor
     public function getLatestKmAttribute()
     {
-        $latest = $this->dailyKms()->orderBy('tarix', 'desc')->first();
-        return $latest ? $latest->km : null;
+        return $this->latestKmRecord?->km;
+    }
+
+    // Ən son statusu almaq üçün aksessor
+    public function getLatestStatusAttribute()
+    {
+        return $this->dailyStatuses()->first();
     }
 
     // ==================== SCOPES ====================
@@ -54,16 +71,5 @@ class Bus extends Model
     public function scopeInactive($query)
     {
         return $query->where('aktiv', false);
-    }
-
-    public function dailyStatuses()
-    {
-        return $this->hasMany(BusDailyStatus::class)->orderBy('tarix', 'desc');
-    }
-
-    // Ən son statusu asanlıqla almaq üçün aksessor:
-    public function getLatestStatusAttribute()
-    {
-        return $this->dailyStatuses()->first();
     }
 }

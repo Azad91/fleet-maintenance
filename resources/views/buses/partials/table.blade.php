@@ -18,6 +18,7 @@
                         <th>Xətt №</th>
                         <th>DQN</th>
                         <th>MOTOR №</th>
+                        <th style="width: 150px; text-align: center;">📊 Son KM</th>
                         <th style="width: 150px; text-align: center;">Əməliyyatlar</th>
                     </tr>
                     <tr id="busTableFilter" style="background-color: #f8f9fa;">
@@ -47,9 +48,10 @@
                                    placeholder="🔍 Motor..." style="font-size: 13px;">
                         </th>
                         <th style="text-align: center;"></th>
+                        <th style="text-align: center;"></th>
                     </tr>
                 </thead>
-                <tbody id="busTableBody">
+                <tbody>
                     @forelse($buses as $bus)
                     <tr>
                         <td style="text-align: center;">{{ $loop->iteration }}</td>
@@ -59,6 +61,15 @@
                         <td>{{ $bus->xett_no ?? '-' }}</td>
                         <td><strong>{{ $bus->dqn }}</strong></td>
                         <td>{{ $bus->motor_no ?? '-' }}</td>
+                        <td style="text-align: center;">
+                            @if($bus->latestKmRecord)
+                                <strong>{{ number_format($bus->latestKmRecord->km, 0, ',', '.') }} km</strong>
+                                <br>
+                                <small class="text-muted">{{ $bus->latestKmRecord->tarix->format('d.m.Y') }}</small>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
                         <td style="text-align: center;">
                             <div class="d-flex justify-content-center gap-1">
                                 <a href="{{ route('buses.show', $bus) }}" class="btn btn-sm btn-outline-primary">
@@ -81,7 +92,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-4">
+                        <td colspan="9" class="text-center text-muted py-4">
                             <i class="bi bi-bus-front" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
                             @if(isset($isEmpty) && $isEmpty)
                                 <p class="mb-0">Axtarış nəticəsində heç nə tapılmadı.</p>
