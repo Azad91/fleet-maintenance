@@ -16,40 +16,40 @@
 </div>
 
 <!-- Axtarış Formu -->
-<div class="card mb-4">
-    <div class="card-body">
-        <form id="searchForm" class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label fw-bold">DQN</label>
-                <input type="text" class="form-control" id="dqn" name="dqn" placeholder="DQN ilə axtar..." value="{{ request('dqn') }}">
+<form id="searchForm" class="mb-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col">
+                    <input type="text" class="form-control form-control-sm" name="dqn" placeholder="🔍 DQN..." value="{{ request('dqn') }}">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control form-control-sm" name="xett_no" placeholder="🔍 Xətt №..." value="{{ request('xett_no') }}">
+                </div>
+                <div class="col">
+                    <select class="form-select form-control-sm" name="yer">
+                        <option value="">📍 Yer</option>
+                        <option value="yol" {{ request('yer') == 'yol' ? 'selected' : '' }}>🛣️ Yol</option>
+                        <option value="qaraj" {{ request('yer') == 'qaraj' ? 'selected' : '' }}>🏠 Qaraj</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control form-control-sm" name="shikayet" placeholder="🔍 Şikayət..." value="{{ request('shikayet') }}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-search"></i> Axtar
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ route('complaints.index') }}" class="btn btn-secondary btn-sm w-100">
+                        <i class="bi bi-arrow-counterclockwise"></i> Sıfırla
+                    </a>
+                </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Xətt №</label>
-                <input type="text" class="form-control" id="xett_no" name="xett_no" placeholder="Xətt № ilə axtar..." value="{{ request('xett_no') }}">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Yer</label>
-                <select class="form-select" id="yer" name="yer">
-                    <option value="">Hamısı</option>
-                    <option value="yol" {{ request('yer') == 'yol' ? 'selected' : '' }}>🛣️ Yol</option>
-                    <option value="qaraj" {{ request('yer') == 'qaraj' ? 'selected' : '' }}>🏠 Qaraj</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Şikayət</label>
-                <input type="text" class="form-control" id="shikayet" name="shikayet" placeholder="Şikayət mətni..." value="{{ request('shikayet') }}">
-            </div>
-            <div class="col-12 text-end">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search"></i> Axtar
-                </button>
-                <a href="{{ route('complaints.create') }}" class="btn btn-info">
-                    <i class="bi bi-plus-lg"></i> Yeni Kart
-                </a>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>
 
 <!-- Nəticələr -->
 <div id="searchResults">
@@ -59,36 +59,23 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
-        const form = document.getElementById('searchForm');
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const params = new URLSearchParams();
 
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                submitSearch();
-            });
-            input.addEventListener('change', function() {
-                submitSearch();
-            });
-        });
-
-        function submitSearch() {
-            const formData = new FormData(form);
-            const params = new URLSearchParams();
-
-            for (let [key, value] of formData.entries()) {
-                if (value) {
-                    params.append(key, value);
-                }
+        for (let [key, value] of formData.entries()) {
+            if (value) {
+                params.append(key, value);
             }
-
-            fetch(`{{ route('complaints.search') }}?${params.toString()}`)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('searchResults').innerHTML = html;
-                })
-                .catch(error => console.error('Xəta:', error));
         }
+
+        fetch(`{{ route('complaints.search') }}?${params.toString()}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('searchResults').innerHTML = html;
+            })
+            .catch(error => console.error('Xəta:', error));
     });
 </script>
 @endsection

@@ -33,7 +33,7 @@ class Complaint extends Model
 
     protected $casts = [
         'tarix' => 'date',
-        'detallar' => 'array',
+        'detallar' => 'array',  // <---  'array'
         'km' => 'integer',
         'service_km' => 'integer',
         'bildirilme_tarix' => 'date',

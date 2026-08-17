@@ -173,7 +173,7 @@ body {
     vertical-align: middle;
     padding: 0px 15px !important;
     font-size: 12px !important;
-    text-align: center;
+    text-align: left;
 }
 
 .table-hover tbody tr:hover {

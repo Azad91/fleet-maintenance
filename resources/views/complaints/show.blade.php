@@ -199,7 +199,13 @@
                     <div class="col-md-6">
                         <div class="p-2 bg-light rounded">
                             <small class="text-muted d-block">👤 Kim iş görüb</small>
-                            <strong>{{ $complaint->kim_is_gorub ?? '-' }}</strong>
+                            <strong>
+                                @if($complaint->employee)
+                                    {{ $complaint->employee->full_name_with_position }}
+                                @else
+                                    {{ $complaint->kim_is_gorub ?? '-' }}
+                                @endif
+                        </strong>
                         </div>
                     </div>
                 </div>

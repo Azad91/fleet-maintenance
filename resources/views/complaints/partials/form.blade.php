@@ -330,24 +330,31 @@
             bildirilmeTarix.setAttribute('required', 'required');
             bildirilmeSaat.setAttribute('required', 'required');
         }
+
+        // Yer dəyişəndə Baxım Növünü də yenilə
+        toggleServiceFields();
     }
 
-    // ==================== 3. TEXNİKİ XİDMƏT (SADƏCƏ BURADA DƏYİŞİKLİK VAR) ====================
-    function toggleServiceFields() {
-        const selectedTip = document.querySelector('input[name="sikayet_tipi"]:checked');
-        const serviceFields = document.getElementById('serviceFields');
+    // ==================== 3. TEXNİKİ XİDMƏT VƏ QARAJ ====================
+function toggleServiceFields() {
+    const selectedTip = document.querySelector('input[name="sikayet_tipi"]:checked');
+    const selectedYer = document.querySelector('input[name="yer"]:checked');
+    const serviceFields = document.getElementById('serviceFields');
 
-        if (selectedTip && selectedTip.value === 'texniki_xidmet') {
-            serviceFields.classList.remove('service-fields-hidden');
-            const busId = document.getElementById('bus_id').value;
-            if (busId) {
-                loadServiceTemplates(busId);
-            }
-        } else {
-            serviceFields.classList.add('service-fields-hidden');
-            document.getElementById('service_template_id').innerHTML = '<option value="">Baxım növünü seçin...</option>';
+    // Əgər həm Texniki Xidmət, həm də Qaraj seçilibsə
+    if (selectedTip && selectedTip.value === 'texniki_xidmet' && selectedYer && selectedYer.value === 'qaraj') {
+        // GÖSTƏR
+        serviceFields.style.display = 'block';
+        const busId = document.getElementById('bus_id').value;
+        if (busId) {
+            loadServiceTemplates(busId);
         }
+    } else {
+        // GİZLƏT
+        serviceFields.style.display = 'none';
+        document.getElementById('service_template_id').innerHTML = '<option value="">Baxım növünü seçin...</option>';
     }
+}
 
     // ==================== 4. BAXIM NÖVLƏRİNİ YÜKLƏ ====================
     function loadServiceTemplates(busId) {
@@ -368,7 +375,7 @@
                 // Sırala
                 data.sort((a, b) => a.km_interval - b.km_interval);
 
-                // YALNIZ cari KM-dən BÖYÜK olanları göstər (məs. 468000 > 466986)
+                // YALNIZ cari KM-dən BÖYÜK olanları göstər
                 const filtered = data.filter(template => template.km_interval > currentKm);
 
                 filtered.forEach(template => {
@@ -477,7 +484,7 @@
         if (!selectedOption || !selectedOption.value) return;
 
         const templateId = selectedOption.value;
-        const templateName = selectedOption.textContent;
+        const templateName = selectedOption.textContent.replace(/\(\d{1,3}\.\d{3}\.\d{3} km\)$/, '').trim();
         const details = JSON.parse(selectedOption.dataset.details || '[]');
 
         const hiddenInput = document.getElementById('service_template_id_hidden');
