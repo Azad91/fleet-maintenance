@@ -1,0 +1,37 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fleet-maintenance-app
+    ports:
+      - "8000:80"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: fleet_maintenance
+      DB_USERNAME: fleet
+      DB_PASSWORD: fleet_password
+
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    container_name: fleet-maintenance-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fleet_maintenance
+      POSTGRES_USER: fleet
+      POSTGRES_PASSWORD: fleet_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

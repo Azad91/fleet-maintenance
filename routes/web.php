@@ -3,7 +3,6 @@
 use App\Http\Controllers\BusController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\ComplaintTypeController;
-use App\Http\Controllers\DailyKmController;
 use App\Http\Controllers\MotorOilController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WarehouseController;
@@ -123,18 +122,6 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-    // ==================== DAILY KM ROUTES ====================
-    Route::prefix('daily-km')->name('daily-km.')->middleware(['role:admin'])->group(function () {
-        Route::get('/import', [DailyKmController::class, 'importForm'])->name('import');
-        Route::post('/import', [DailyKmController::class, 'import'])->name('import.store');
-        Route::get('/create', [DailyKmController::class, 'create'])->name('create');
-        Route::post('/', [DailyKmController::class, 'store'])->name('store');
-        Route::get('/', [DailyKmController::class, 'index'])->name('index');
-        Route::get('/{daily_km}/edit', [DailyKmController::class, 'edit'])->name('edit');
-        Route::put('/{daily_km}', [DailyKmController::class, 'update'])->name('update');
-        Route::delete('/{daily_km}', [DailyKmController::class, 'destroy'])->name('destroy');
-    });
-
     // ==================== MOTOR OIL ROUTES ====================
     Route::prefix('motor-oil')->name('motor-oil.')->middleware(['role:admin'])->group(function () {
         Route::get('/', [MotorOilController::class, 'index'])->name('index');
@@ -156,7 +143,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
     });
 
-    // ==================== BUS DAILY STATUS ROUTES (YENİ) ====================
+    // ==================== BUS DAILY STATUS ROUTES ====================
     Route::prefix('bus-daily-statuses')->name('bus-daily-statuses.')->middleware(['role:admin'])->group(function () {
         Route::get('/import', [BusDailyStatusController::class, 'importForm'])->name('import');
         Route::post('/import', [BusDailyStatusController::class, 'import'])->name('import.store');
@@ -167,6 +154,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{bus_daily_status}/edit', [BusDailyStatusController::class, 'edit'])->name('edit');
         Route::put('/{bus_daily_status}', [BusDailyStatusController::class, 'update'])->name('update');
         Route::delete('/{bus_daily_status}', [BusDailyStatusController::class, 'destroy'])->name('destroy');
+    });
+
+    // ==================== DAILY KM RECORDS ROUTES ====================
+    Route::prefix('daily-km-records')->name('daily-km-records.')->middleware(['role:admin'])->group(function () {
+        Route::get('/import', [DailyKmRecordController::class, 'importForm'])->name('import');
+        Route::post('/import', [DailyKmRecordController::class, 'import'])->name('import.store');
+        Route::get('/create', [DailyKmRecordController::class, 'create'])->name('create');
+        Route::post('/', [DailyKmRecordController::class, 'store'])->name('store');
+        Route::get('/', [DailyKmRecordController::class, 'index'])->name('index');
+        Route::get('/{daily_km_record}', [DailyKmRecordController::class, 'show'])->name('show');
+        Route::get('/{daily_km_record}/edit', [DailyKmRecordController::class, 'edit'])->name('edit');
+        Route::put('/{daily_km_record}', [DailyKmRecordController::class, 'update'])->name('update');
+        Route::delete('/{daily_km_record}', [DailyKmRecordController::class, 'destroy'])->name('destroy');
     });
 });
 
@@ -193,7 +193,11 @@ Route::get('get-detal-by-kod/{kod}', function ($kod) {
 
 Route::get('get-bus-km-by-id/{bus_id}', function ($bus_id) {
     $bus = App\Models\Bus::find($bus_id);
-    return response()->json(['km' => $bus ? $bus->km : null]);
+    if ($bus) {
+        $latestKm = $bus->dailyKmRecords()->latest('tarix')->first();
+        return response()->json(['km' => $latestKm ? $latestKm->km : null]);
+    }
+    return response()->json(['km' => null]);
 })->name('get.bus.km.by.id');
 
 Route::get('get-service-templates/{bus_id}', function ($bus_id) {
@@ -213,16 +217,3 @@ Route::get('get-service-templates/{bus_id}', function ($bus_id) {
     });
     return response()->json($result);
 })->name('get.service.templates');
-
-// ========== GÜNDƏLİK KM RECORDS (YENİ) ==========
-Route::prefix('daily-km-records')->name('daily-km-records.')->middleware(['role:admin'])->group(function () {
-    Route::get('/import', [DailyKmRecordController::class, 'importForm'])->name('import');
-    Route::post('/import', [DailyKmRecordController::class, 'import'])->name('import.store');
-    Route::get('/create', [DailyKmRecordController::class, 'create'])->name('create');
-    Route::post('/', [DailyKmRecordController::class, 'store'])->name('store');
-    Route::get('/', [DailyKmRecordController::class, 'index'])->name('index');
-    Route::get('/{daily_km_record}', [DailyKmRecordController::class, 'show'])->name('show');
-    Route::get('/{daily_km_record}/edit', [DailyKmRecordController::class, 'edit'])->name('edit');
-    Route::put('/{daily_km_record}', [DailyKmRecordController::class, 'update'])->name('update');
-    Route::delete('/{daily_km_record}', [DailyKmRecordController::class, 'destroy'])->name('destroy');
-});

@@ -11,8 +11,10 @@ class MotorOilController extends Controller
 {
     public function index()
     {
+        // Bütün detalları götür, km-ə görə qruplaşdır
         $details = MotorOilDetail::orderBy('km')->orderBy('detal_adi')->get();
         $grouped = $details->groupBy('km');
+
         return view('motor-oil.index', compact('grouped'));
     }
 
@@ -20,8 +22,10 @@ class MotorOilController extends Controller
     {
         $search = $request->search;
 
+        // Axtarış: əgər search varsa, km-ə görə filtr et
         $details = MotorOilDetail::when($search, function ($query, $search) {
-            return $query->where('km', $search);
+            // Həm tam ədəd, həm də formatlı (məs. 36.000) axtarışını dəstəklə
+            return $query->where('km', (int) $search);
         })
         ->orderBy('km')
         ->orderBy('detal_adi')

@@ -171,8 +171,9 @@ body {
 
 .table td {
     vertical-align: middle;
-    padding: 12px 15px;
-    font-size: 14px;
+    padding: 0px 15px !important;
+    font-size: 12px !important;
+    text-align: center;
 }
 
 .table-hover tbody tr:hover {

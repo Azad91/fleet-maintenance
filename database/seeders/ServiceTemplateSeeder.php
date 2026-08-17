@@ -3,46 +3,33 @@
 namespace Database\Seeders;
 
 use App\Models\ServiceTemplate;
+use App\Models\MotorOilDetail;
 use Illuminate\Database\Seeder;
 
 class ServiceTemplateSeeder extends Seeder
 {
     public function run(): void
     {
-        ServiceTemplate::create([
-            'name' => 'Koropka Yağ Dəyişməsi',
-            'default_km_interval' => 180000,
-            'details' => [
-                ['kodu' => 'YAG-001', 'adi' => 'Koropka Yağı', 'miqdar' => 3],
-                ['kodu' => 'FIL-002', 'adi' => 'Yağ Filtri', 'miqdar' => 1],
-            ]
-        ]);
+        // MotorOilDetail cədvəlindəki bütün unikal km-ləri götür
+        $uniqueKms = MotorOilDetail::select('km')->distinct()->orderBy('km')->pluck('km');
 
-        ServiceTemplate::create([
-            'name' => 'Most Yağ Dəyişməsi',
-            'default_km_interval' => 180000,
-            'details' => [
-                ['kodu' => 'YAG-003', 'adi' => 'Most Yağı', 'miqdar' => 5],
-            ]
-        ]);
+        foreach ($uniqueKms as $km) {
+            // Hər bir km-ə aid detalları çək
+            $details = MotorOilDetail::where('km', $km)->get()->map(function ($item) {
+                return [
+                    'kodu' => $item->detal_kodu,
+                    'adi'  => $item->detal_adi,
+                    'miqdar' => $item->miqdar,
+                    'say'    => $item->say,
+                ];
+            })->toArray();
 
-        ServiceTemplate::create([
-            'name' => 'Motor Yağ Dəyişməsi (36000)',
-            'default_km_interval' => 36000,
-            'details' => [
-                ['kodu' => 'YAG-004', 'adi' => 'Motor Yağı', 'miqdar' => 5],
-                ['kodu' => 'FIL-001', 'adi' => 'Yağ Filtri', 'miqdar' => 1],
-            ]
-        ]);
-
-        ServiceTemplate::create([
-            'name' => 'Motor Yağ Dəyişməsi (72000)',
-            'default_km_interval' => 72000,
-            'details' => [
-                ['kodu' => 'YAG-004', 'adi' => 'Motor Yağı', 'miqdar' => 5],
-                ['kodu' => 'FIL-001', 'adi' => 'Yağ Filtri', 'miqdar' => 1],
-                ['kodu' => 'AIR-001', 'adi' => 'Hava Filtri', 'miqdar' => 1],
-            ]
-        ]);
+            // ServiceTemplate yarat
+            ServiceTemplate::create([
+                'name' => "Motor Yağ Dəyişməsi ({$km} km)",
+                'default_km_interval' => $km,
+                'details' => $details,
+            ]);
+        }
     }
 }
