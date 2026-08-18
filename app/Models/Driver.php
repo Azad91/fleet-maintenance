@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Driver extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'kodu',
+        'ad',
+        'soyad',
+        'telefon',
+        'vezifesi',
+        'aktiv',
+        'qeyd',
+    ];
+
+    protected $casts = [
+        'aktiv' => 'boolean',
+    ];
+
+    public function getFullNameAttribute()
+    {
+        if (empty($this->soyad)) {
+            return $this->ad;
+        }
+        return $this->ad . ' ' . $this->soyad;
+    }
+
+    public function getFullNameWithCodeAttribute()
+    {
+        return $this->kodu . ' - ' . $this->full_name;
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('aktiv', true);
+    }
+}

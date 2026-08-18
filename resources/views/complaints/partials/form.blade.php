@@ -58,11 +58,29 @@
     </div>
 </div>
 
-<!-- ==================== 4. SÜRÜCÜ ADI ==================== -->
+<!-- ==================== 4. SÜRÜCÜ ==================== -->
 <div class="mb-3" id="surucuField">
-    <label for="surucu_adi" class="form-label fw-bold">🧑‍✈️ Sürücü Adı</label>
-    <input type="text" class="form-control" id="surucu_adi" name="surucu_adi"
-           placeholder="Məs: Elşad Məmmədov" value="{{ old('surucu_adi') }}">
+    <label class="form-label fw-bold">🧑‍✈️ Sürücü <span class="text-danger">*</span></label>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="driver_kodu" class="form-label">Sürücü Kodu</label>
+            <input type="text" class="form-control" id="driver_kodu" name="driver_kodu"
+                   placeholder="Məs: D-001" list="driverList"
+                   oninput="getDriverByKod(this.value)" value="{{ old('driver_kodu') }}">
+            <datalist id="driverList">
+                @foreach($drivers ?? [] as $driver)
+                    <option value="{{ $driver->kodu }}">
+                @endforeach
+            </datalist>
+        </div>
+        <div class="col-md-8">
+            <label for="surucu_adi" class="form-label">Sürücü Adı</label>
+            <input type="text" class="form-control input-disabled" id="surucu_adi" name="surucu_adi"
+                   placeholder="Kod daxil edildikdə avtomatik gəlir..." readonly
+                   value="{{ old('surucu_adi') }}">
+            <input type="hidden" name="driver_id" id="driver_id" value="{{ old('driver_id') }}">
+        </div>
+    </div>
 </div>
 
 <!-- ==================== 5. DİNAMİK ŞİKAYƏTLƏR ==================== -->
@@ -713,5 +731,23 @@ function toggleServiceFields() {
     document.addEventListener('DOMContentLoaded', function() {
         toggleFields();
     });
+
+    // ==================== SÜRÜCÜ KODUNA GÖRƏ AD ÇƏK ====================
+    function getDriverByKod(kod) {
+        if (!kod) {
+            document.getElementById('surucu_adi').value = '';
+            document.getElementById('driver_id').value = '';
+            return;
+        }
+
+        fetch(`/get-driver-by-kod/${kod}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('surucu_adi').value = data.driver_ad || '';
+                document.getElementById('driver_id').value = data.driver_id || '';
+            })
+            .catch(error => console.error('Xəta:', error));
+    }
+
 </script>
 @endsection

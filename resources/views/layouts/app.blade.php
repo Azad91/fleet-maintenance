@@ -29,11 +29,11 @@
                         <div class="user-role fw-bold">
                             @php
                                 $roleLabels = [
-                                    'admin' => '👑 Admin',
-                                    'directorate' => '👁️ Müdiriyyət',
-                                    'complaint' => '📋 Şikayət',
-                                    'warehouse' => '📦 Anbar',
-                                    'bus' => '🚌 Avtobus',
+                                    'admin' => 'OPERATION',
+                                    'directorate' => 'Müdiriyyət',
+                                    'complaint' => 'Şikayət',
+                                    'warehouse' => 'Anbar',
+                                    'bus' => 'Avtobus',
                                 ];
                             @endphp
                             {{ $roleLabels[Auth::user()->role] ?? Auth::user()->role }}
@@ -93,6 +93,10 @@
                         <i class="bi bi-eye"></i> Yalnız Baxış
                     </div>
                 @endif
+
+                <a href="{{ route('drivers.index') }}" class="{{ request()->routeIs('drivers.*') ? 'active' : '' }}">
+                    <i class="bi bi-person"></i> Sürücülər
+                </a>
 
                 @if($role == 'admin')
                     <div class="nav-label">İdarəetmə</div>
