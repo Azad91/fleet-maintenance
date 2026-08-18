@@ -14,105 +14,127 @@
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0">
-            <!-- SIDEBAR -->
-            <div class="col-md-2 sidebar">
-                <div class="brand">
-                    <i class="bi bi-car-front-fill"></i> Fleet
+        <!-- SIDEBAR -->
+        <div class="col-md-2 sidebar">
+            <!-- <div class="brand user-info">
+                Fleet <i class="bi bi-car-front-fill"></i>
+            </div> -->
+            <!-- 👤 İSTİFADƏÇİ MƏLUMATLARI -->
+            @auth
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="bi bi-person-circle"></i>
                 </div>
-
-                <div class="nav-label">Əsas</div>
-                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-
-                @auth
-                    @php
-                        $role = Auth::user()->role;
-                    @endphp
-
-                    @if($role == 'admin' || $role == 'bus' || $role == 'directorate')
-                        <div class="nav-label">İdarəetmə</div>
-                        <a href="{{ route('buses.index') }}" class="{{ request()->routeIs('buses.*') ? 'active' : '' }}">
-                            <i class="bi bi-bus-front"></i> Avtobuslar
-                        </a>
-                    @endif
-
-
-                    @if($role == 'admin' || $role == 'complaint' || $role == 'directorate')
-                        <a href="{{ route('complaints.index') }}" class="{{ request()->routeIs('complaints.*') ? 'active' : '' }}">
-                            <i class="bi bi-clipboard"></i> Kartlar
-                        </a>
-                    @endif
-
-                    @if($role == 'admin' || $role == 'warehouse' || $role == 'directorate')
-                        <a href="{{ route('warehouses.index') }}" class="{{ request()->routeIs('warehouses.*') ? 'active' : '' }}">
-                            <i class="bi bi-box-seam"></i> Anbar
-                        </a>
-                    @endif
-
-                    @if($role == 'admin')
-                        <div class="nav-label">Texniki Xidmət</div>
-                        <a href="{{ route('motor-oil.index') }}" class="{{ request()->routeIs('motor-oil.*') ? 'active' : '' }}">
-                            <i class="bi bi-droplet"></i> Motor Yağ
-                        </a>
-
-                        <a href="{{ route('bus-daily-statuses.index') }}" class="{{ request()->routeIs('bus-daily-statuses.*') ? 'active' : '' }}">
-                            <i class="bi bi-calendar2-check"></i> Gündəlik Status
-                        </a>
-
-                        <!-- YENİ KM QEYDLƏRİ -->
-                        <a href="{{ route('daily-km-records.index') }}" class="{{ request()->routeIs('daily-km-records.*') ? 'active' : '' }}">
-                            <i class="bi bi-speedometer2"></i> Gündəlik KM
-                        </a>
-                    @endif
-
-                    @if($role == 'directorate')
-                        <div class="nav-label text-warning mt-3">
-                            <i class="bi bi-eye"></i> Yalnız Baxış
+                    <div class="user-details">
+                        <div class="user-role fw-bold">
+                            @php
+                                $roleLabels = [
+                                    'admin' => '👑 Admin',
+                                    'directorate' => '👁️ Müdiriyyət',
+                                    'complaint' => '📋 Şikayət',
+                                    'warehouse' => '📦 Anbar',
+                                    'bus' => '🚌 Avtobus',
+                                ];
+                            @endphp
+                            {{ $roleLabels[Auth::user()->role] ?? Auth::user()->role }}
                         </div>
-                    @endif
+                    </div>
+                </div>
+            @endauth
 
-                    @if($role == 'admin')
-                        <div class="nav-label">İdarəetmə</div>
-                        <a href="{{ route('employees.index') }}" class="{{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                            <i class="bi bi-people"></i> İşçilər
-                        </a>
-                    @endif
+            <div class="nav-label">Əsas</div>
+            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
 
-                    <hr>
-                    <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">
-                        <i class="bi bi-person"></i> Profil
+            @auth
+                @php
+                    $role = Auth::user()->role;
+                @endphp
+
+                @if($role == 'admin' || $role == 'bus' || $role == 'directorate')
+                    <div class="nav-label">İdarəetmə</div>
+                    <a href="{{ route('buses.index') }}" class="{{ request()->routeIs('buses.*') ? 'active' : '' }}">
+                        <i class="bi bi-bus-front"></i> Avtobuslar
+                    </a>
+                @endif
+
+
+                @if($role == 'admin' || $role == 'complaint' || $role == 'directorate')
+                    <a href="{{ route('complaints.index') }}" class="{{ request()->routeIs('complaints.*') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard"></i> Kartlar
+                    </a>
+                @endif
+
+                @if($role == 'admin' || $role == 'warehouse' || $role == 'directorate')
+                    <a href="{{ route('warehouses.index') }}" class="{{ request()->routeIs('warehouses.*') ? 'active' : '' }}">
+                        <i class="bi bi-box-seam"></i> Anbar
+                    </a>
+                @endif
+
+                @if($role == 'admin')
+                    <div class="nav-label">Texniki Xidmət</div>
+                    <a href="{{ route('motor-oil.index') }}" class="{{ request()->routeIs('motor-oil.*') ? 'active' : '' }}">
+                        <i class="bi bi-droplet"></i> Motor Yağ
                     </a>
 
-                    <hr>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-box-arrow-right"></i> Çıxış
-                        </button>
-                    </form>
-                @endauth
-            </div>
+                    <a href="{{ route('bus-daily-statuses.index') }}" class="{{ request()->routeIs('bus-daily-statuses.*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar2-check"></i> Gündəlik Status
+                    </a>
 
-            <!-- CONTENT -->
-            <div class="col-md-10 content">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <!-- YENİ KM QEYDLƏRİ -->
+                    <a href="{{ route('daily-km-records.index') }}" class="{{ request()->routeIs('daily-km-records.*') ? 'active' : '' }}">
+                        <i class="bi bi-speedometer2"></i> Gündəlik KM
+                    </a>
+                @endif
+
+                @if($role == 'directorate')
+                    <div class="nav-label text-warning mt-3">
+                        <i class="bi bi-eye"></i> Yalnız Baxış
                     </div>
                 @endif
 
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
+                @if($role == 'admin')
+                    <div class="nav-label">İdarəetmə</div>
+                    <a href="{{ route('employees.index') }}" class="{{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                        <i class="bi bi-people"></i> İşçilər
+                    </a>
                 @endif
 
-                @yield('content')
-            </div>
+                <hr>
+                <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                    <i class="bi bi-person"></i> Profil
+                </a>
+
+                <hr>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-box-arrow-right"></i> Çıxış
+                    </button>
+                </form>
+            @endauth
         </div>
+
+        <!-- CONTENT -->
+        <div class="col-md-10 content">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @yield('content')
+        </div>
+    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
