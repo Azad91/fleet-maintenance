@@ -356,55 +356,57 @@ function toggleServiceFields() {
     }
 }
 
-    // ==================== 4. BAXIM NÖVLƏRİNİ YÜKLƏ ====================
-    function loadServiceTemplates(busId) {
-        if (!busId) {
+ // ==================== 4. BAXIM NÖVLƏRİNİ YÜKLƏ ====================
+function loadServiceTemplates(busId) {
+    if (!busId) {
+        const select = document.getElementById('service_template_id');
+        select.innerHTML = '<option value="">Avtobus seçin...</option>';
+        return;
+    }
+
+    const currentKm = parseInt(document.getElementById('km').value) || 0;
+
+    // ✅ DÜZƏLİŞ: window.location.origin istifadə et
+    fetch(window.location.origin + '/get-service-templates/' + busId)
+        .then(response => response.json())
+        .then(data => {
+            console.log('📦 Gələn məlumatlar:', data); // <-- BUNU ƏLAVƏ ET (yoxlamaq üçün)
             const select = document.getElementById('service_template_id');
-            select.innerHTML = '<option value="">Avtobus seçin...</option>';
-            return;
-        }
+            select.innerHTML = '<option value="">Baxım növünü seçin...</option>';
 
-        const currentKm = parseInt(document.getElementById('km').value) || 0;
+            // Sırala
+            data.sort((a, b) => a.km_interval - b.km_interval);
 
-        fetch('/get-service-templates/' + busId)
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('service_template_id');
-                select.innerHTML = '<option value="">Baxım növünü seçin...</option>';
+            // YALNIZ cari KM-dən BÖYÜK olanları göstər
+            const filtered = data.filter(template => template.km_interval > currentKm);
 
-                // Sırala
-                data.sort((a, b) => a.km_interval - b.km_interval);
-
-                // YALNIZ cari KM-dən BÖYÜK olanları göstər
-                const filtered = data.filter(template => template.km_interval > currentKm);
-
-                filtered.forEach(template => {
-                    if (template.details && template.details.length > 0) {
-                        const option = document.createElement('option');
-                        option.value = template.id;
-                        const kmFormatted = new Intl.NumberFormat('az').format(template.km_interval);
-                        option.textContent = template.name + ' (' + kmFormatted + ' km)';
-                        option.dataset.km = template.km_interval;
-                        option.dataset.details = JSON.stringify(template.details);
-                        select.appendChild(option);
-                    }
-                });
-
-                if (select.options.length <= 1) {
+            filtered.forEach(template => {
+                if (template.details && template.details.length > 0) {
                     const option = document.createElement('option');
-                    option.value = '';
-                    option.textContent = '🔔 Növbəti baxım vaxtı hələ gəlməyib';
-                    option.disabled = true;
-                    option.selected = true;
+                    option.value = template.id;
+                    const kmFormatted = new Intl.NumberFormat('az').format(template.km_interval);
+                    option.textContent = template.name;
+                    option.dataset.km = template.km_interval;
+                    option.dataset.details = JSON.stringify(template.details);
                     select.appendChild(option);
                 }
-            })
-            .catch(error => {
-                console.error('Xəta:', error);
-                const select = document.getElementById('service_template_id');
-                select.innerHTML = '<option value="">Xəta baş verdi</option>';
             });
-    }
+
+            if (select.options.length <= 1) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '🔔 Növbəti baxım vaxtı hələ gəlməyib';
+                option.disabled = true;
+                option.selected = true;
+                select.appendChild(option);
+            }
+        })
+        .catch(error => {
+            console.error('Xəta:', error);
+            const select = document.getElementById('service_template_id');
+            select.innerHTML = '<option value="">Xəta baş verdi</option>';
+        });
+}
 
     // ==================== 5. DETALLARI TEMPLATE-DƏN DOLDUR ====================
     function fillDetallarFromTemplate(details) {
