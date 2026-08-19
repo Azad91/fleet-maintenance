@@ -169,75 +169,73 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{daily_km_record}', [DailyKmRecordController::class, 'update'])->name('update');
         Route::delete('/{daily_km_record}', [DailyKmRecordController::class, 'destroy'])->name('destroy');
     });
-});
 
-/*
-|--------------------------------------------------------------------------
-| API Routes (JSON)
-|--------------------------------------------------------------------------
-*/
-Route::get('get-bus-id-by-xett/{xett_no}', function ($xett_no) {
-    $bus = App\Models\Bus::where('xett_no', $xett_no)->first();
-    return response()->json([
-        'dqn' => $bus ? $bus->dqn : null,
-        'bus_id' => $bus ? $bus->id : null
-    ]);
-})->name('get.bus.id.by.xett');
-
-Route::get('get-detal-by-kod/{kod}', function ($kod) {
-    $detal = App\Models\Warehouse::where('kod', $kod)->first();
-    return response()->json([
-        'detal_adi' => $detal ? $detal->ad : null,
-        'depo_miqdari' => $detal ? $detal->miqdar : null,
-    ]);
-})->name('get.detal.by.kod');
-
-Route::get('get-bus-km-by-id/{bus_id}', function ($bus_id) {
-    $bus = App\Models\Bus::find($bus_id);
-    if ($bus) {
-        $latestKm = $bus->dailyKmRecords()->latest('tarix')->first();
-        return response()->json(['km' => $latestKm ? $latestKm->km : null]);
-    }
-    return response()->json(['km' => null]);
-})->name('get.bus.km.by.id');
-
-Route::get('get-service-templates/{bus_id}', function ($bus_id) {
-    $bus = App\Models\Bus::find($bus_id);
-    if (!$bus) return response()->json([]);
-
-    $templates = App\Models\ServiceTemplate::all();
-    $result = $templates->map(function ($template) use ($bus) {
-        $interval = App\Models\BusServiceInterval::where('bus_id', $bus->id)
-            ->where('service_template_id', $template->id)->first();
-        return [
-            'id' => $template->id,
-            'name' => $template->name,
-            'km_interval' => $interval ? $interval->custom_km_interval : $template->default_km_interval,
-            'details' => $template->details,
-        ];
+    // ==================== DRIVER ROUTES ====================
+    Route::prefix('drivers')->name('drivers.')->middleware(['role:admin'])->group(function () {
+        Route::get('/import', [DriverController::class, 'importForm'])->name('import');
+        Route::post('/import', [DriverController::class, 'import'])->name('import.store');
+        Route::get('/export', [DriverController::class, 'export'])->name('export');
+        Route::get('/', [DriverController::class, 'index'])->name('index');
+        Route::get('/create', [DriverController::class, 'create'])->name('create');
+        Route::post('/', [DriverController::class, 'store'])->name('store');
+        Route::get('/{driver}', [DriverController::class, 'show'])->name('show');
+        Route::get('/{driver}/edit', [DriverController::class, 'edit'])->name('edit');
+        Route::put('/{driver}', [DriverController::class, 'update'])->name('update');
+        Route::delete('/{driver}', [DriverController::class, 'destroy'])->name('destroy');
     });
-    return response()->json($result);
-})->name('get.service.templates');
 
-// ==================== DRIVER ROUTES ====================
-Route::prefix('drivers')->name('drivers.')->middleware(['role:admin'])->group(function () {
-    Route::get('/import', [DriverController::class, 'importForm'])->name('import');
-    Route::post('/import', [DriverController::class, 'import'])->name('import.store');
-    Route::get('/export', [DriverController::class, 'export'])->name('export');
-    Route::get('/', [DriverController::class, 'index'])->name('index');
-    Route::get('/create', [DriverController::class, 'create'])->name('create');
-    Route::post('/', [DriverController::class, 'store'])->name('store');
-    Route::get('/{driver}', [DriverController::class, 'show'])->name('show');
-    Route::get('/{driver}/edit', [DriverController::class, 'edit'])->name('edit');
-    Route::put('/{driver}', [DriverController::class, 'update'])->name('update');
-    Route::delete('/{driver}', [DriverController::class, 'destroy'])->name('destroy');
+    // ==================== API ROUTES (JSON) ====================
+    // Qeyd: bu route-lar giriş etmiş istifadəçilər üçün nəzərdə tutulub,
+    // ona görə auth middleware qrupunun içinə köçürüldü.
+    Route::get('get-bus-id-by-xett/{xett_no}', function ($xett_no) {
+        $bus = App\Models\Bus::where('xett_no', $xett_no)->first();
+        return response()->json([
+            'dqn' => $bus ? $bus->dqn : null,
+            'bus_id' => $bus ? $bus->id : null
+        ]);
+    })->name('get.bus.id.by.xett');
+
+    Route::get('get-detal-by-kod/{kod}', function ($kod) {
+        $detal = App\Models\Warehouse::where('kod', $kod)->first();
+        return response()->json([
+            'detal_adi' => $detal ? $detal->ad : null,
+            'depo_miqdari' => $detal ? $detal->miqdar : null,
+        ]);
+    })->name('get.detal.by.kod');
+
+    Route::get('get-bus-km-by-id/{bus_id}', function ($bus_id) {
+        $bus = App\Models\Bus::find($bus_id);
+        if ($bus) {
+            $latestKm = $bus->dailyKmRecords()->latest('tarix')->first();
+            return response()->json(['km' => $latestKm ? $latestKm->km : null]);
+        }
+        return response()->json(['km' => null]);
+    })->name('get.bus.km.by.id');
+
+    Route::get('get-service-templates/{bus_id}', function ($bus_id) {
+        $bus = App\Models\Bus::find($bus_id);
+        if (!$bus) return response()->json([]);
+
+        $templates = App\Models\ServiceTemplate::all();
+        $result = $templates->map(function ($template) use ($bus) {
+            $interval = App\Models\BusServiceInterval::where('bus_id', $bus->id)
+                ->where('service_template_id', $template->id)->first();
+            return [
+                'id' => $template->id,
+                'name' => $template->name,
+                'km_interval' => $interval ? $interval->custom_km_interval : $template->default_km_interval,
+                'details' => $template->details,
+            ];
+        });
+        return response()->json($result);
+    })->name('get.service.templates');
+
+    Route::get('get-driver-by-kod/{kod}', function ($kod) {
+        $driver = App\Models\Driver::where('kodu', $kod)->first();
+        return response()->json([
+            'driver_ad' => $driver ? $driver->full_name : null,
+            'driver_id' => $driver ? $driver->id : null,
+        ]);
+    })->name('get.driver.by.kod');
+
 });
-
-// ==================== API ROUTE ====================
-Route::get('get-driver-by-kod/{kod}', function ($kod) {
-    $driver = App\Models\Driver::where('kodu', $kod)->first();
-    return response()->json([
-        'driver_ad' => $driver ? $driver->full_name : null,
-        'driver_id' => $driver ? $driver->id : null,
-    ]);
-})->name('get.driver.by.kod');
