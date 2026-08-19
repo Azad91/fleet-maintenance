@@ -10,36 +10,44 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin yarat
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@fleet.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
+        // Admin
+        User::updateOrCreate(
+            ['email' => 'admin@fleet.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
 
         // Müdiriyyət
-        User::create([
-            'name' => 'Müdiriyyət',
-            'email' => 'directorate@fleet.com',
-            'password' => Hash::make('password'),
-            'role' => 'directorate',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'directorate@fleet.com'],
+            [
+                'name' => 'Müdiriyyət',
+                'password' => Hash::make('password'),
+                'role' => 'directorate',
+            ]
+        );
 
         // Şikayət işçisi
-        User::create([
-            'name' => 'Şikayət İşçisi',
-            'email' => 'complaint@fleet.com',
-            'password' => Hash::make('password'),
-            'role' => 'complaint',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'complaint@fleet.com'],
+            [
+                'name' => 'Şikayət İşçisi',
+                'password' => Hash::make('password'),
+                'role' => 'complaint',
+            ]
+        );
 
         // Anbar işçisi
-        User::create([
-            'name' => 'Anbar İşçisi',
-            'email' => 'warehouse@fleet.com',
-            'password' => Hash::make('password'),
-            'role' => 'warehouse',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'warehouse@fleet.com'],
+            [
+                'name' => 'Anbar İşçisi',
+                'password' => Hash::make('password'),
+                'role' => 'warehouse',
+            ]
+        );
     }
 }

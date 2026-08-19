@@ -40,7 +40,7 @@
                 }
             });
 
-            fetch('{{ url('/buses/search') }}?' + params.toString())
+            fetch(window.location.origin + '/buses/search?' + params.toString())
                 .then(response => response.text())
                 .then(html => {
                     const tempDiv = document.createElement('div');
