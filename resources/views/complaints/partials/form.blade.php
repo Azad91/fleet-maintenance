@@ -301,7 +301,7 @@
             return;
         }
 
-        fetch(`/get-bus-id-by-xett/${xett_no}`)
+        fetch('{{ url('/get-bus-id-by-xett') }}/' + xett_no)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('dqn').value = data.dqn || '';

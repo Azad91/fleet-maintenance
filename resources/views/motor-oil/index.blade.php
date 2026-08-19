@@ -42,7 +42,7 @@
 @section('scripts')
 <script>
     function liveSearch(query) {
-        fetch(`{{ route('motor-oil.search') }}?search=${encodeURIComponent(query)}`)
+        fetch('{{ url('/motor-oil/search') }}?' + encodeURIComponent(query))
             .then(response => response.text())
             .then(html => {
                 document.getElementById('searchResults').innerHTML = html;

@@ -40,7 +40,7 @@
                 }
             });
 
-            fetch(`{{ route('buses.search') }}?${params.toString()}`)
+            fetch('{{ url('/buses/search') }}?' + params.toString())
                 .then(response => response.text())
                 .then(html => {
                     const tempDiv = document.createElement('div');

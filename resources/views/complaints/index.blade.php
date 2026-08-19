@@ -70,7 +70,7 @@
             }
         }
 
-        fetch(`{{ route('complaints.search') }}?${params.toString()}`)
+        fetch('{{ url('/complaints/search') }}?' + params.toString())
             .then(response => response.text())
             .then(html => {
                 document.getElementById('searchResults').innerHTML = html;

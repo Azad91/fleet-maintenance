@@ -45,7 +45,7 @@
 @section('scripts')
 <script>
     function liveSearch(query) {
-        fetch(`{{ route('warehouses.search') }}?search=${encodeURIComponent(query)}`)
+        fetch('{{ url('/warehouses/search') }}?' + params.toString())
             .then(response => response.text())
             .then(html => {
                 document.getElementById('searchResults').innerHTML = html;
