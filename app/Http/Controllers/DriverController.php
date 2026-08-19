@@ -23,7 +23,7 @@ class DriverController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'kodu' => 'required|unique:drivers,kodu',
             'ad' => 'required|string|max:255',
             'soyad' => 'nullable|string|max:255',
@@ -32,7 +32,7 @@ class DriverController extends Controller
             'qeyd' => 'nullable|string',
         ]);
 
-        Driver::create($request->all());
+        Driver::create($validated);
         return redirect()->route('drivers.index')->with('success', 'Sürücü uğurla əlavə edildi!');
     }
 
@@ -52,7 +52,7 @@ class DriverController extends Controller
     {
         $driver = Driver::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'kodu' => 'required|unique:drivers,kodu,' . $id,
             'ad' => 'required|string|max:255',
             'soyad' => 'nullable|string|max:255',
@@ -61,7 +61,7 @@ class DriverController extends Controller
             'qeyd' => 'nullable|string',
         ]);
 
-        $driver->update($request->all());
+        $driver->update($validated);
         return redirect()->route('drivers.index')->with('success', 'Sürücü uğurla yeniləndi!');
     }
 

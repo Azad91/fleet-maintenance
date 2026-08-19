@@ -24,14 +24,14 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'ad' => 'required|string|max:255',
             'soyad' => 'required|string|max:255',
             'vezifesi' => 'required|string|max:255',
             'qeyd' => 'nullable|string',
         ]);
 
-        Employee::create($request->all());
+        Employee::create($validated);
 
         return redirect()->route('employees.index')->with('success', 'İşçi uğurla əlavə edildi!');
     }
@@ -55,14 +55,14 @@ class EmployeeController extends Controller
     {
         $employee = Employee::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'ad' => 'required|string|max:255',
             'soyad' => 'required|string|max:255',
             'vezifesi' => 'required|string|max:255',
             'qeyd' => 'nullable|string',
         ]);
 
-        $employee->update($request->all());
+        $employee->update($validated);
 
         return redirect()->route('employees.index')->with('success', 'İşçi uğurla yeniləndi!');
     }

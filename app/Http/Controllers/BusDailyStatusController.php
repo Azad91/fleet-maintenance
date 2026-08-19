@@ -23,13 +23,13 @@ class BusDailyStatusController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'bus_id' => 'required|exists:buses,id',
             'tarix'  => 'required|date',
             'status' => 'required|string',
         ]);
 
-        BusDailyStatus::create($request->all());
+        BusDailyStatus::create($validated);
         return redirect()->route('bus-daily-statuses.index')->with('success', 'Status uğurla əlavə edildi!');
     }
 
@@ -49,12 +49,12 @@ class BusDailyStatusController extends Controller
     public function update(Request $request, $id)
     {
         $status = BusDailyStatus::findOrFail($id);
-        $request->validate([
+        $validated = $request->validate([
             'bus_id' => 'required|exists:buses,id',
             'tarix'  => 'required|date',
             'status' => 'required|string',
         ]);
-        $status->update($request->all());
+        $status->update($validated);
         return redirect()->route('bus-daily-statuses.index')->with('success', 'Status yeniləndi!');
     }
 

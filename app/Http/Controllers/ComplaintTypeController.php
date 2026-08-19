@@ -22,11 +22,11 @@ class ComplaintTypeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        ComplaintType::create($request->all());
+        ComplaintType::create($validated);
 
         return redirect()->route('complaint-types.index')->with('success', 'Şikayət növü uğurla əlavə edildi!');
     }
@@ -41,11 +41,11 @@ class ComplaintTypeController extends Controller
     {
         $type = ComplaintType::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        $type->update($request->all());
+        $type->update($validated);
 
         return redirect()->route('complaint-types.index')->with('success', 'Şikayət növü uğurla yeniləndi!');
     }

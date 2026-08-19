@@ -10,24 +10,26 @@ use App\Imports\DailyKmRecordsImport;
 
 class DailyKmRecordController extends Controller
 {
-public function index(Request $request)
-{
-    $search = $request->search;
-    $query = DailyKmRecord::with('bus');
+    public function index(Request $request)
+    {
+        $search = $request->search;
+        $query = DailyKmRecord::with('bus');
 
-    if ($search) {
-        $query->whereHas('bus', function($q) use ($search) {
-            $q->where('dqn', 'ILIKE', "%{$search}%")
-              ->orWhere('xett_no', 'ILIKE', "%{$search}%");
-        })->orWhere('tarix', 'ILIKE', "%{$search}%");
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('bus', function ($bq) use ($search) {
+                    $bq->where('dqn', 'ILIKE', "%{$search}%")
+                       ->orWhere('xett_no', 'ILIKE', "%{$search}%");
+                })->orWhere('tarix', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        // GET() ƏVƏZİNƏ PAGINATE() İSTİFADƏ EDİRİK
+        // Hər səhifədə 100 qeyd göstər
+        $records = $query->orderBy('tarix', 'desc')->paginate(100);
+
+        return view('daily-km-records.index', compact('records', 'search'));
     }
-
-    // BURADA GET() ƏVƏZİNƏ PAGINATE() İSTİFADƏ EDİRİK
-    // Hər səhifədə 100 qeyd göstər
-    $records = $query->orderBy('tarix', 'desc')->paginate(100);
-
-    return view('daily-km-records.index', compact('records', 'search'));
-}
 
     public function create()
     {
@@ -37,28 +39,28 @@ public function index(Request $request)
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'bus_id' => 'required|exists:buses,id',
             'tarix'  => 'required|date',
             'km'     => 'required|integer|min:0',
         ]);
 
-        DailyKmRecord::create($request->all());
+        DailyKmRecord::create($validated);
         return redirect()->route('daily-km-records.index')->with('success', 'KM məlumatı uğurla əlavə edildi!');
     }
 
-public function show($id)
-{
-    // 1. Cari qeydi tap
-    $record = DailyKmRecord::with('bus')->findOrFail($id);
+    public function show($id)
+    {
+        // 1. Cari qeydi tap
+        $record = DailyKmRecord::with('bus')->findOrFail($id);
 
-    // 2. Həmin avtobusa aid BÜTÜN qeydləri götür (tarixə görə sırala)
-    $history = DailyKmRecord::where('bus_id', $record->bus_id)
-                ->orderBy('tarix', 'desc')
-                ->get();
+        // 2. Həmin avtobusa aid BÜTÜN qeydləri götür (tarixə görə sırala)
+        $history = DailyKmRecord::where('bus_id', $record->bus_id)
+                    ->orderBy('tarix', 'desc')
+                    ->get();
 
-    return view('daily-km-records.show', compact('record', 'history'));
-}
+        return view('daily-km-records.show', compact('record', 'history'));
+    }
 
     public function edit($id)
     {
@@ -70,12 +72,12 @@ public function show($id)
     public function update(Request $request, $id)
     {
         $record = DailyKmRecord::findOrFail($id);
-        $request->validate([
+        $validated = $request->validate([
             'bus_id' => 'required|exists:buses,id',
             'tarix'  => 'required|date',
             'km'     => 'required|integer|min:0',
         ]);
-        $record->update($request->all());
+        $record->update($validated);
         return redirect()->route('daily-km-records.index')->with('success', 'KM məlumatı yeniləndi!');
     }
 
