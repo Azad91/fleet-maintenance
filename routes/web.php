@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\BusDailyStatusController;
 use App\Http\Controllers\DailyKmRecordController;
+use App\Http\Controllers\DriverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -217,3 +218,26 @@ Route::get('get-service-templates/{bus_id}', function ($bus_id) {
     });
     return response()->json($result);
 })->name('get.service.templates');
+
+// ==================== DRIVER ROUTES ====================
+Route::prefix('drivers')->name('drivers.')->middleware(['role:admin'])->group(function () {
+    Route::get('/import', [DriverController::class, 'importForm'])->name('import');
+    Route::post('/import', [DriverController::class, 'import'])->name('import.store');
+    Route::get('/export', [DriverController::class, 'export'])->name('export');
+    Route::get('/', [DriverController::class, 'index'])->name('index');
+    Route::get('/create', [DriverController::class, 'create'])->name('create');
+    Route::post('/', [DriverController::class, 'store'])->name('store');
+    Route::get('/{driver}', [DriverController::class, 'show'])->name('show');
+    Route::get('/{driver}/edit', [DriverController::class, 'edit'])->name('edit');
+    Route::put('/{driver}', [DriverController::class, 'update'])->name('update');
+    Route::delete('/{driver}', [DriverController::class, 'destroy'])->name('destroy');
+});
+
+// ==================== API ROUTE ====================
+Route::get('get-driver-by-kod/{kod}', function ($kod) {
+    $driver = App\Models\Driver::where('kodu', $kod)->first();
+    return response()->json([
+        'driver_ad' => $driver ? $driver->full_name : null,
+        'driver_id' => $driver ? $driver->id : null,
+    ]);
+})->name('get.driver.by.kod');

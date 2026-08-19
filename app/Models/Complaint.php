@@ -29,6 +29,7 @@ class Complaint extends Model
     'is_bitme_tarix',
     'is_bitme_saat',
     'employee_id',
+    'driver_id',
     ];
 
     protected $casts = [
@@ -62,4 +63,8 @@ class Complaint extends Model
     {
         return $this->belongsTo(Employee::class);
     }
+    public function driver()
+{
+    return $this->belongsTo(Driver::class);
+}
 }

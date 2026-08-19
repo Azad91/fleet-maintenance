@@ -42,14 +42,15 @@
                             </strong>
                         </div>
                     </div>
+                    <!-- Sürücü -->
                     <div class="col-md-3">
                         <div class="p-2 bg-light rounded">
-                            <small class="text-muted d-block">Sürücü</small>
+                            <small class="text-muted d-block">🧑‍✈️ Sürücü</small>
                             <strong>
-                                @if($complaint->yer == 'yol')
-                                    {{ $complaint->surucu_adi ?? '-' }}
+                                @if($complaint->driver)
+                                    {{ $complaint->driver->full_name }} ({{ $complaint->driver->kodu }})
                                 @else
-                                    <span class="text-muted">-</span>
+                                    {{ $complaint->surucu_adi ?? '-' }}
                                 @endif
                             </strong>
                         </div>
@@ -57,7 +58,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Şikayətlər -->
         <div class="row mb-4">
             <div class="col-12">

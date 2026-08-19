@@ -641,3 +641,67 @@ body {
 .pagination-wrapper .pagination {
     margin-bottom: 0;
 }
+
+/* ============================================
+   SIDEBAR - USER INFO (GÖRÜNƏN)
+   ============================================ */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    margin: 12px 14px 20px 14px;
+    background: rgba(255, 255, 255, 0.12); /* Açıq fon */
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.user-info:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.user-avatar {
+    font-size: 36px;
+    color: #4CAF50;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name {
+    color: #FFFFFF !important; /* AĞ RƏNG - GÖRÜNƏN */
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.user-role {
+    color: rgba(255, 255, 255, 0.7) !important; /* AĞA YAXIN - GÖRÜNƏN */
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Brand-dan sonra boşluq */
+.brand {
+    margin-bottom: 4px;
+}
+
+.user-info {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.25), rgba(76, 175, 80, 0.10));
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    /* Qalan stillər eyni */
+}
