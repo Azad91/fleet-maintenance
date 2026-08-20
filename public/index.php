@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
+ini_set('max_input_vars', 3000);
+
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...
